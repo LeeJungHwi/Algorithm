@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Code">
+      <UniqueIdentifier>{af7b221f-f8b8-4525-9557-ce39cc0bb3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\inflearn">
+      <UniqueIdentifier>{8602f803-7531-4da3-b45c-ff9868b39abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\leetcode">
+      <UniqueIdentifier>{673ae2be-a9e4-4c2c-9e22-4c67a3a312f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\hackerrank">
+      <UniqueIdentifier>{d3991f82-0d8b-4c26-bf06-c2d4b3842f47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\baekjoon">
+      <UniqueIdentifier>{43ee5cc8-0c1c-48b1-b497-4cb560a07d2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\programmers">
+      <UniqueIdentifier>{ed55d711-6f19-4242-b2d1-b9fbd3ccfed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="txtfile">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="inflearn\AA.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA2.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA3.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA4.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA5.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA6.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA7.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA8.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA9.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA10.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA11.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA12.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA13.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA14.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA15.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA16.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA17.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA18.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA19.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA20.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA21.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA22.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA23.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA24.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA25.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA26.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA27.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA28.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA29.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA30.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA31.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA32.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA33.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA34.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA35.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA36.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA37.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA38.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA39.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA40.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="input.txt">
+      <Filter>txtfile</Filter>
+    </Text>
+    <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\basicsetting.txt">
+      <Filter>txtfile</Filter>
+    </Text>
+    <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\learn.txt">
+      <Filter>txtfile</Filter>
+    </Text>
+    <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\resolve.txt">
+      <Filter>txtfile</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Filter>txtfile</Filter>
+    </None>
+  </ItemGroup>
+</Project>
