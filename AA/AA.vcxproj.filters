@@ -145,6 +145,9 @@
     <ClCompile Include="inflearn\AA40.cpp">
       <Filter>Code\inflearn</Filter>
     </ClCompile>
+    <ClCompile Include="AA41.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
@@ -157,6 +160,9 @@
       <Filter>txtfile</Filter>
     </Text>
     <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\resolve.txt">
+      <Filter>txtfile</Filter>
+    </Text>
+    <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\git.txt">
       <Filter>txtfile</Filter>
     </Text>
   </ItemGroup>

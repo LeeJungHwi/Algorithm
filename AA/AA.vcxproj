@@ -151,6 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AA41.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="inflearn\AA.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -274,6 +277,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\basicsetting.txt" />
+    <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\git.txt" />
     <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\learn.txt" />
     <Text Include="..\..\..\IT취업을+위한+알고리즘+문제풀이+강의자료\resolve.txt" />
     <Text Include="input.txt" />
