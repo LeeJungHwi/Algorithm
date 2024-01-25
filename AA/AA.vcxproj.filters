@@ -7,12 +7,6 @@
     <Filter Include="Code\inflearn">
       <UniqueIdentifier>{8602f803-7531-4da3-b45c-ff9868b39abf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\leetcode">
-      <UniqueIdentifier>{673ae2be-a9e4-4c2c-9e22-4c67a3a312f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\hackerrank">
-      <UniqueIdentifier>{d3991f82-0d8b-4c26-bf06-c2d4b3842f47}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Code\baekjoon">
       <UniqueIdentifier>{43ee5cc8-0c1c-48b1-b497-4cb560a07d2c}</UniqueIdentifier>
     </Filter>
@@ -146,6 +140,15 @@
       <Filter>Code\inflearn</Filter>
     </ClCompile>
     <ClCompile Include="inflearn\AA41.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA42.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA43.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA44.cpp">
       <Filter>Code\inflearn</Filter>
     </ClCompile>
   </ItemGroup>
