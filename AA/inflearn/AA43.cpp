@@ -36,6 +36,7 @@ int main()
 
 	first = minutes[0]; // 5
 
+	// DVD 용량 범위는 5 ~ 64
 	// DVD 최소 용량 구하기
 	// first		avg				last
 	// 5			34	O			64
