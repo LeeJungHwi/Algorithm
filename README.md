@@ -1,7 +1,7 @@
 # 코딩테스트 대비 알고리즘 문제 풀이  
 
 **사용 언어** : C++  
-**문제 출처** : inflearn, programmers, baekjoon, leetcode, hackerrank  
+**문제 출처** : inflearn, programmers, baekjoon  
 **공부 내용** : 알고리즘 문제 풀이 후 1일 1커밋  
 
 ## 문제 목록  
@@ -47,3 +47,5 @@
 [두 배열 합치기] AA39  
 [교집합(투포인터)] AA40  
 [연속된 자연수 합] AA41  
+[이진탐색] AA42  
+[뮤직비디오] AA43  

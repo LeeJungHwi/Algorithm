@@ -88,3 +88,6 @@ int main()
 
 	return 0;
 }
+
+// 핵심
+// lowNum 조건 체크
