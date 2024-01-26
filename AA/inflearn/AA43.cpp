@@ -7,7 +7,7 @@ using namespace std;
 // 뮤직비디오
 int main()
 {
-	ios_base::sync_with_stdio(false);
+	//ios_base::sync_with_stdio(false);
 	//cin.tie(0);
 	//ifstream cin;
 	//cin.open("input.txt");
