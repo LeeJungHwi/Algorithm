@@ -8,12 +8,9 @@ int main()
 	int result = 0; // result
 	cin >> n >> m;
 
-	for (int i = 1; i < n + 1; i++) // 1~N 까지
+	for (int i = m; i < n + 1; i += m) // m의 배수를 더함
 	{
-		if (i % m == 0)
-		{
-			result += i; // M 배수합
-		}
+		result += i;
 	}
 
 	cout << result << "\n";
