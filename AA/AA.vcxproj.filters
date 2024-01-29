@@ -208,6 +208,21 @@
     <ClCompile Include="inflearn\AA63.cpp">
       <Filter>Code\inflearn</Filter>
     </ClCompile>
+    <ClCompile Include="inflearn\AA64.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA65.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA66.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA67.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA68.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
