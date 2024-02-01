@@ -6,7 +6,7 @@ using namespace std;
 
 vector<pair<int, int> > pizza; // 피자집
 vector<pair<int, int> > house; // 집
-vector<int> ch(20); // 선택된 피자집
+vector<int> vis(20); // 선택된 피자집
 int n, m; // N, M 4, 4
 int minDis = 2147000000; // 도시 피자배달거리 최솟값
 int pizzaDis; // 각 집들의 피자배달거리
@@ -26,8 +26,8 @@ void DFS(int level, int start)
 
 			for (int j = 0; j < m; j++) // 선택된 피자집만큼 돌면서 
 			{
-				int x2 = pizza[ch[j]].first; // 피자집 x좌표
-				int y2 = pizza[ch[j]].second; // 피자집 y좌표
+				int x2 = pizza[vis[j]].first; // 피자집 x좌표
+				int y2 = pizza[vis[j]].second; // 피자집 y좌표
 				pizzaDis = min(pizzaDis, abs(x1 - x2) + abs(y1 - y2)); // 집 피자배달거리 최솟값 갱신
 			}
 
@@ -43,7 +43,7 @@ void DFS(int level, int start)
 	{
 		for (int i = start; i < pizza.size(); i++) // 피자집 개수 중 m개 조합 ->  0 1 2 3, 0 1 2 4, ....
 		{
-			ch[level] = i;
+			vis[level] = i;
 			DFS(level + 1, i + 1);
 		}
 	}
