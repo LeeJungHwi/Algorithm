@@ -100,3 +100,5 @@
 [네트워크 선 자르기(topDown)] AA92  
 [계단오르기(topDown)] AA93  
 [돌다리 건너기(bottomUp] AA94  
+[최대 부분 증가수열(LIS)] AA95  
+[최대 선 연결하기(LIS)] AA96  
