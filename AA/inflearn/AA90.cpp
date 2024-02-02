@@ -94,9 +94,6 @@ int main()
 	simba.ate = 0;
 
 	// BFS
-	/*
-	
-	*/
 	while (!Q.empty()) // 큐가 빌때까지
 	{
 		// 우선순위에 맞게 이동할 위치 꺼냄
