@@ -23,7 +23,6 @@ int main()
 	cout << " = " << result << "\n"; // = result
 	return 0;
 }
-
 // 핵심
 // 진약수 -> 자기자신을 제외한 약수
 // " + "를 앞에 쓰기

@@ -38,6 +38,5 @@ int main()
 
 	return 0;
 }
-
 // 핵심
 // 문자를 숫자로 -> char - '0'

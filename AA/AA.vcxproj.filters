@@ -7,12 +7,6 @@
     <Filter Include="Code\inflearn">
       <UniqueIdentifier>{8602f803-7531-4da3-b45c-ff9868b39abf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\baekjoon">
-      <UniqueIdentifier>{43ee5cc8-0c1c-48b1-b497-4cb560a07d2c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\programmers">
-      <UniqueIdentifier>{ed55d711-6f19-4242-b2d1-b9fbd3ccfed9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="txtfile">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
