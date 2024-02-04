@@ -4,7 +4,9 @@
 #include <fstream>
 using namespace std;
 
-int main() {
+// ≈‰∏∂≈‰
+int main()
+{
 	ios_base::sync_with_stdio(false);
 	cin.tie(0);
 	//ifstream cin;
@@ -118,7 +120,7 @@ int main() {
 		}
 	}
 
-	cout << minDay  - 1 << '\n';
+	cout << minDay - 1 << '\n';
 
 	return 0;
 }
