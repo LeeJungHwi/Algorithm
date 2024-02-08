@@ -379,6 +379,15 @@
     <ClCompile Include="inflearn\AA122.cpp">
       <Filter>Code\inflearn</Filter>
     </ClCompile>
+    <ClCompile Include="inflearn\AA123.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA124.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
+    <ClCompile Include="inflearn\AA125.cpp">
+      <Filter>Code\inflearn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
