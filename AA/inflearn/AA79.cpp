@@ -5,23 +5,23 @@
 #include <fstream>
 using namespace std;
 
-vector<bool> vis(30); // 방문체크
+vector<bool> vis1(30); // 방문체크
 
 // 도로정보 구조체
 struct Edge
 {
 	int vertex;
-	int cost;
+	int distance;
 
 	Edge(int v, int c) // 생성자
 	{
 		vertex = v;
-		cost = c;
+		distance = c;
 	}
 
 	bool operator<(const Edge &edge)const // 최소힙 정렬
 	{
-		return cost > edge.cost;
+		return distance > edge.distance;
 	}
 };
 
@@ -79,12 +79,12 @@ int main()
 		minHeap.pop();
 
 		int vertex = tmpEdge.vertex; // 해당 도시로가는
-		int cost = tmpEdge.cost; // 비용
+		int cost = tmpEdge.distance; // 비용
 
-		if (!vis[vertex]) // 아직 방문하지 않았으면
+		if (!vis1[vertex]) // 아직 방문하지 않았으면
 		{
 			minCost += cost; // 비용 누적
-			vis[vertex] = true; // 방문 체크
+			vis1[vertex] = true; // 방문 체크
 
 			for (int i = 0; i < graph[vertex].size(); i++) // 해당 도시로부터 갈수있는 도시정보 최소힙에 추가
 			{

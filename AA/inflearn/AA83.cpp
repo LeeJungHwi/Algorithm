@@ -3,7 +3,7 @@
 using namespace std;
 
 int sequence[10]; // 순열 배열
-bool vis[10]; // 방문 체크
+bool vis1[10]; // 방문 체크
 
 int send() // SEND
 {
@@ -41,12 +41,12 @@ void SendMoreMoney(int num)
 	{
 		for (int i = 0; i < 10; i++) // 0~9 숫자중에서 뽑아서 순열 생성
 		{
-			if (!vis[i])
+			if (!vis1[i])
 			{
 				sequence[num] = i; // 순열 배열 값 할당
-				vis[i] = true; // 방문체크
+				vis1[i] = true; // 방문체크
 				SendMoreMoney(num + 1);
-				vis[i] = false; // 방문해제
+				vis1[i] = false; // 방문해제
 			}
 		}
 	}

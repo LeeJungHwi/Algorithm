@@ -7,7 +7,7 @@ using namespace std;
 
 int n, d, k; // N, D, K 8, 4, 3
 vector<vector<int> > students(30001); // 학생 소스취향 
-vector<int> vis(16); // 방문체크
+vector<int> vis1(16); // 방문체크
 int maxStuCnt; // 음식을 먹을 수 있는 최대학생 수
 
 // DFS
@@ -34,7 +34,7 @@ void DFS(int L, int cnt)
 
 			for (int j = 0; j < students[i].size(); j++)
 			{
-				if (!vis[students[i][j]]) // 음식에 하나라도 학생이 좋아하는 재료가 빠지면 먹을수없음
+				if (!vis1[students[i][j]]) // 음식에 하나라도 학생이 좋아하는 재료가 빠지면 먹을수없음
 				{
 					isEat = false;
 					break;
@@ -55,9 +55,9 @@ void DFS(int L, int cnt)
 	}
 	else
 	{
-		vis[L] = true; // 소스 선택
+		vis1[L] = true; // 소스 선택
 		DFS(L + 1, cnt += 1);
-		vis[L] = false; // 소스 미선택
+		vis1[L] = false; // 소스 미선택
 		DFS(L + 1, cnt -= 1);
 	}
 }

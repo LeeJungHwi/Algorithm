@@ -12,18 +12,18 @@ struct Edge
 {
 	int vertex1;
 	int vertex2;
-	int cost;
+	int distance;
 
 	Edge(int v1, int v2, int c) // 생성자
 	{
 		vertex1 = v1;
 		vertex2 = v2;
-		cost = c;
+		distance = c;
 	}
 
 	bool operator<(Edge &edge) // 도로 유지비용 기준 오름차순 정렬
 	{
-		return cost < edge.cost;
+		return distance < edge.distance;
 	}
 };
 
@@ -123,7 +123,7 @@ int main()
 
 		if (findVertex1 != findVertex2) // 도시가 서로 다른집합에 속하면
 		{
-			minCost += edge[i].cost; // 비용 누적
+			minCost += edge[i].distance; // 비용 누적
 			Union(edge[i].vertex1, edge[i].vertex2); // 집합 합침
 		}
 	}
