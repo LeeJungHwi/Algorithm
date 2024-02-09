@@ -33,6 +33,7 @@ int main()
 	c	-3
 	b	-4
 	*/
+	// 공백문자와 각 문자열 매칭 점수 저장
 	for (int i = 1; i < first.size() + 1; i++)
 	{
 		lengths[i][0] = n2 * i;

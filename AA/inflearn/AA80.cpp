@@ -6,7 +6,7 @@ using namespace std;
 
 vector<pair<int, int>> graph[30]; // 그래프
 vector<int> dist(30, 2147000000); // 거리배열 초기화 : dist[i] -> 1번정점에서 i번정점으로 가는데 최소비용
-vector<bool> vis(30); // 방문체크
+vector<bool> vis1(30); // 방문체크
 
 // 다익스트라
 int main()
@@ -57,13 +57,13 @@ int main()
 		// 갈수있는 정점 중 아직 방문하지않은 정점중에 거리가 가장 가까운 정점 찾기
 		for (int j = 1; j < n + 1; j++)
 		{
-			if (!vis[j] && dist[j] < dist[minIdx])
+			if (!vis1[j] && dist[j] < dist[minIdx])
 			{
 				minIdx = j;
 			}
 		}
 
-		vis[minIdx] = true; // 가장 가까운 정점 방문체크
+		vis1[minIdx] = true; // 가장 가까운 정점 방문체크
 
 		for (int j = 0; j < graph[minIdx].size(); j++) // 가장 가까운 정점에서 갈수있는 정점의 최소값 갱신
 		{

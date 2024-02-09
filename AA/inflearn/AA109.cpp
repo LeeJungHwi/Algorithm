@@ -6,8 +6,8 @@
 using namespace std;
 
 int n; // N 6
-vector<pair<int, int> > players(16); // 선수(횐돌능력치, 검은돌능력치)
-vector<bool> vis(16); // 방문체크 : true면 흰돌선수
+vector<pair<int, int> > players1(16); // 선수(횐돌능력치, 검은돌능력치)
+vector<bool> vis1(16); // 방문체크 : true면 흰돌선수
 int minGap = 2147000000; // 능력치 차 최소값
 
 // DFS
@@ -29,15 +29,15 @@ void DFS(int L, int cnt)
 		// abs(흰돌 선수의 능력치 합 - 검은돌 선수의 능력치 합)로 min값 갱신
 		for (int i = 0; i < n; i++)
 		{
-			if (vis[i])
+			if (vis1[i])
 			{
 				// 흰돌 선수 능력치 합
-				white += players[i].first;
+				white += players1[i].first;
 				continue;
 			}
 
 			// 검은돌 선수 능력치 합
-			black += players[i].second;
+			black += players1[i].second;
 		}
 
 		int gap = abs(white - black); // 능력치 차
@@ -49,9 +49,9 @@ void DFS(int L, int cnt)
 	}
 	else
 	{
-		vis[L] = true; // 흰돌선수로 뽑음
+		vis1[L] = true; // 흰돌선수로 뽑음
 		DFS(L + 1, cnt += 1); // 뽑은 횟수 증가 DFS
-		vis[L] = false; // 흰돌선수로 안 뽑음 
+		vis1[L] = false; // 흰돌선수로 안 뽑음 
 		DFS(L + 1, cnt -= 1); // 뽑은 횟수 감소 DFS
 	}
 }
@@ -72,7 +72,7 @@ int main()
 	{
 		cin >> white >> black;
 
-		players[i] = { white, black };
+		players1[i] = { white, black };
 	}
 
 	// DFS

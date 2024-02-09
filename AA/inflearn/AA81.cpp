@@ -10,13 +10,13 @@ struct Edge
 {
 	int vertex1;
 	int vertex2;
-	int cost;
+	int distance;
 
 	Edge(int v1, int v2, int c)
 	{
 		vertex1 = v1;
 		vertex2 = v2;
-		cost = c;
+		distance = c;
 	}
 };
 
@@ -71,7 +71,7 @@ int main()
 		{
 			int vertex1 = graph[j].vertex1;
 			int vertex2 = graph[j].vertex2;
-			int cost = graph[j].cost;
+			int cost = graph[j].distance;
 
 			if (dist[vertex1] != 2147000000 && dist[vertex1] + cost < dist[vertex2]) // 출발이 무한대면 더했을때 더 커지므로 갱신안됨, 갈수있는 정점에 가서 비용을 더했더니 기존 비용보다 작으면 갱신
 			{
@@ -85,7 +85,7 @@ int main()
 	{
 		int vertex1 = graph[j].vertex1;
 		int vertex2 = graph[j].vertex2;
-		int cost = graph[j].cost;
+		int cost = graph[j].distance;
 
 		if (dist[vertex1] != 2147000000 && dist[vertex1] + cost < dist[vertex2])
 		{
