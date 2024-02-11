@@ -21,6 +21,7 @@ int main()
 
 	// 웅덩이 위치 체크
 	int kPos;
+
 	for (int i = 0; i < k; i++)
 	{
 		cin >> kPos;
@@ -34,9 +35,9 @@ int main()
 
 	while (!checkPos.empty()) // 큐가 빌때까지
 	{
-		int sizeBackUp = checkPos.size(); // 큐 사이즈 백업 ??
+		int checkCnt = checkPos.size(); // 체크할 지점의 수
 
-		for (int i = 0; i < sizeBackUp; i++) // 백업된 큐 사이즈만큼 돌면서 ??
+		while (checkCnt != 0)
 		{
 			// 기준위치 꺼냄
 			int standardPos = checkPos.front();
@@ -51,12 +52,12 @@ int main()
 			for (int i = 0; i < 3; i++)
 			{
 				// 기준위치에서 -1 +1 +5 중 하나로 바로갈수있으면 점프횟수 + 1 출력 후 프로그램 종료
-				if (checkDir[i] == e) 
+				if (checkDir[i] == e)
 				{
 					cout << jumpCnt + 1;
 					exit(0);
 				}
-				
+
 				// 경계체크
 				if (checkDir[i] < 1 || checkDir[i] > 10000)
 				{
@@ -73,6 +74,9 @@ int main()
 				checkPos.push(checkDir[i]);
 				vis[checkDir[i]] = 1;
 			}
+
+			// 하나의 지점에서 갈 수 있는곳 체크한 상태
+			checkCnt--;
 		}
 
 		// 점프횟수 증가
