@@ -7,7 +7,7 @@ using namespace std;
 
 int n, firstRobot, secondRobot; // 방의개수, 첫번째로봇방, 두번째로봇방 9, 1, 9
 vector<vector<pair<int, int>>> graph(100001); //  연결리스트방식으로 방 연결
-vector<bool> vis(10001); //  방문체크
+vector<bool> vis(100001); //  방문체크
 vector<int> path; // 첫번째로봇이 두번째로봇까지 가는데 거치는 정점 저장 1, 2, 5, 9
 
 // DFS
@@ -47,14 +47,6 @@ int main()
 
 	cin >> n >> firstRobot >> secondRobot;
 
-	// 시작부터 바로 통신가능하면 0 출력
-	if (abs(firstRobot - secondRobot) == 1)
-	{
-		cout << 0 << '\n';
-
-		return 0;
-	}
-
 	//	1 2 8
 	//	2 3 6
 	//	2 4 5
@@ -72,6 +64,25 @@ int main()
 		// 양방향 연결
 		graph[v1].push_back({ v2, c });
 		graph[v2].push_back({ v1, c });
+	}
+
+	// 방이 하나인 경우와 두 로봇이 같은방에 있는 경우 0 출력 -> 바로 통신 가능
+	if (n == 1 || firstRobot == secondRobot)
+	{
+		cout << 0 << '\n';
+
+		return 0;
+	}
+
+	// 두로봇이 같은 통로 위에 있는 경우 0 출력 -> 바로 통신 가능
+	for (int i = 0; i < graph[firstRobot].size(); i++)
+	{
+		if (graph[firstRobot][i].first == secondRobot)
+		{
+			cout << 0 << '\n';
+
+			return 0;
+		}
 	}
 
 	// DFS
