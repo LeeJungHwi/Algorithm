@@ -8,7 +8,7 @@
 #include <fstream>
 using namespace std;
 
-int dis[1001][1001][11][2];
+int dis[1001][1001][11][2]; // 거리 (이거 벡터로 하면 메모리초과나서 배열로 바꿔줬더니 해결했음)
 
 // 벽 부수고 이동하기 3
 int main()
@@ -122,13 +122,10 @@ int main()
 
 			// 빈칸체크
 			// 처음 방문이면 큐에저장, 거리증가, 낮밤전환
-			if (graph[checkI][checkJ] == '0')
+			if (dis[checkI][checkJ][checkS][!checkT] == 0) // 처음 방문이면
 			{
-				if (dis[checkI][checkJ][checkS][!checkT] == 0) // 처음 방문이면
-				{
-					checkPos.push({ checkI, checkJ, checkS, !checkT });
-					dis[checkI][checkJ][checkS][!checkT] = dis[get<0>(standardPos)][get<1>(standardPos)][checkS][checkT] + 1;
-				}
+				checkPos.push({ checkI, checkJ, checkS, !checkT });
+				dis[checkI][checkJ][checkS][!checkT] = dis[get<0>(standardPos)][get<1>(standardPos)][checkS][checkT] + 1;
 			}
 		}
 	}
