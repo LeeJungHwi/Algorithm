@@ -45,7 +45,7 @@ int main()
 
 		// 위치 => 직사각형 좌상
 		// 상하는 w만큼 좌우는 h만큼 체크
-		for (int i = 0; i < 4; i++)
+		loop(i, 0, 4)
 		{
 			// 경계체크, 방문체크 => 좌상에서 상하좌우 한칸씩만 확인
 			if (i % 2 == 0)
@@ -80,7 +80,7 @@ int main()
 			{
 				// w 만큼 우로 가면서 상하 체크
 				// 하나라도 경계를 만나거나 벽에 막히면 isMove false, break
-				for (int j = 0; j < w; j++)
+				loop(j, 0, w)
 				{
 					int checkI = standardPos.X + checkDir[i].X;
 					int checkJ = standardPos.Y + checkDir[i].Y + j;
@@ -108,7 +108,7 @@ int main()
 			{
 				// h 만큼 하로 가면서 좌우 체크
 				// 하나라도 경계를 만나거나 벽에 막히면 isMove false, break
-				for (int j = 0; j < h; j++)
+				loop(j, 0, h)
 				{
 					int checkI = standardPos.X + checkDir[i].X + j;
 					int checkJ = standardPos.Y + checkDir[i].Y;
