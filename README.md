@@ -8,12 +8,7 @@
 <br>
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-
-#define home 0
-#define cond(c, t, f) ((c) ? (t) : (f))
-#define elprint(a) cout << a << '\n'
+#include "mylib.h"
 
 // 백준
 struct Baekjoon
@@ -47,7 +42,7 @@ struct Codeforces
 };
 
 // PS 목표
-bool IsCondition(int curBaekjoonSolve, string curBaekjoonTier, int curProgrammersSolve, string curCodeforcesTier)
+bool IsEscapePS(int curBaekjoonSolve, string curBaekjoonTier, int curProgrammersSolve, string curCodeforcesTier)
 {
     if(curBaekjoonSolve < 1000) return false;
     if(curBaekjoonTier != "diamond5") return false;
@@ -57,9 +52,6 @@ bool IsCondition(int curBaekjoonSolve, string curBaekjoonTier, int curProgrammer
     return true;
 }
 
-bool IsEscapePS(int curBaekjoonSolve, string curBaekjoonTier, int curProgrammersSolve, string curCodeforcesTier)
-{ return cond(IsCondition(curBaekjoonSolve, curBaekjoonTier, curProgrammersSolve, curCodeforcesTier), true, false); }
-
 // PS 탈출
 int main()
 {
@@ -67,9 +59,10 @@ int main()
     Programmers myProgrammers = Programmers("wnd4114294225", 116);
     Codeforces myCodeforces = Codeforces("wnd4114294225", "Unrated");
 
-    while(!IsEscapePS(myBaekjoon.solveCnt, myBaekjoon.tier, myProgrammers.solveCnt, myCodeforces.tier)) elprint("PS 탈출 ㄴㄴ");
+    while(!IsEscapePS(myBaekjoon.solveCnt, myBaekjoon.tier, myProgrammers.solveCnt, myCodeforces.tier))
+        elp("PS 탈출 ㄴㄴ");
 
-    elprint("PS 탈출 ㅇㅇ");
+    elp("PS 탈출 ㅇㅇ");
 
     return home;
 }
