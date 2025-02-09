@@ -61,47 +61,16 @@ int main()
 		graph[v2].push_back({ v1, 1 });
 	}
 
-	// 각 정점에서 숙박할 시 비용
-	vector<int> dis(n);
-	queue<int> qq;
+	// 멀티 소스 다익 => 모든 좀비 도시 부터 다익스트라
+	// 최단거리가 s 이하면 q원 아니면 p원
+	priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>> pq;
+	vector<ll> dis(n, LLONG_MAX);
+
 	mloop(it, zPos)
 	{
-		qq.push(it->lhs);
-		dis[it->lhs] = 1;
+		pq.push({ home, it->lhs });
+		dis[it->lhs] = home;
 	}
-
-	while (!qq.empty())
-	{
-		int sp = qq.front();
-		qq.pop();
-
-		loop(i, home, graph[sp].size())
-		{
-			int cp = graph[sp][i].lhs;
-
-			if (dis[cp] > home) continue;
-
-			dis[cp] = dis[sp] + 1;
-			qq.push(cp);
-		}
-	}
-	loop(i, home, n)
-	{
-		--dis[i];
-		dis[i] = cond(dis[i] <= s, q, p);
-		if (zPos[i] > home) dis[i] = home;
-		//scp(dis[i]);
-	}
-
-	// 0번 도시부터 다익스트라
-	loop(i, home, graph.size()) loop(j, home, graph[i].size()) graph[i][j] = { graph[i][j].lhs, dis[i] };
-
-	priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>> pq;
-	vector<ll> dis2(n, LLONG_MAX);
-	loop(i, home, n) dis2[i] = LLONG_MAX;
-
-	pq.push({ home, home });
-	dis2[home] = home;
 
 	while (!pq.empty())
 	{
@@ -109,7 +78,40 @@ int main()
 		ll sc = pq.top().lhs;
 		pq.pop();
 
-		if (dis2[sp] < sc) continue;
+		if (dis[sp] < sc) continue;
+
+		loop(i, home, graph[sp].size())
+		{
+			int cp = graph[sp][i].lhs;
+			ll cc = graph[sp][i].rhs;
+
+			if (dis[cp] <= dis[sp] + cc) continue;
+
+			dis[cp] = dis[sp] + cc;
+			pq.push({ dis[cp], cp });
+		}
+	}
+	loop(i, home, n)
+	{
+		dis[i] = cond(dis[i] <= s, q, p);
+		if (zPos[i] > home) dis[i] = home;
+		//scp(dis[i]);
+	}
+
+	loop(i, home, graph.size()) loop(j, home, graph[i].size()) graph[i][j] = { graph[i][j].lhs, dis[i] };
+	loop(i, home, n) dis[i] = LLONG_MAX;
+
+	// 0번 도시부터 다익스트라
+	pq.push({ home, home });
+	dis[home] = home;
+
+	while (!pq.empty())
+	{
+		int sp = pq.top().rhs;
+		ll sc = pq.top().lhs;
+		pq.pop();
+
+		if (dis[sp] < sc) continue;
 
 		loop(i, home, graph[sp].size())
 		{
@@ -117,15 +119,15 @@ int main()
 			ll cc = graph[sp][i].rhs;
 
 			if (zPos[cp] > home) continue;
-			if (dis2[cp] <= dis2[sp] + cc) continue;
+			if (dis[cp] <= dis[sp] + cc) continue;
 
-			dis2[cp] = dis2[sp] + cc;
-			pq.push({ dis2[cp], cp });
+			dis[cp] = dis[sp] + cc;
+			pq.push({ dis[cp], cp });
 		}
 	}
 
 	// 첫 도시와 마지막 도시는 숙박할 필요 없음
-	elp(dis2[n - 1] - graph[home][home].rhs);
+	elp(dis[n - 1] - graph[home][home].rhs);
 	
 
 	return home;
