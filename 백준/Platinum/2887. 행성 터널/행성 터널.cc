@@ -40,6 +40,8 @@ using namespace std;
 const int MAX = 2147000000;
 const int MIN = -2147000000;
 
+#include <unordered_map>
+
 vector<int> unf(100001);
 
 int Find(int v)
