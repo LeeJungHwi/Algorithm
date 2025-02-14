@@ -1,101 +1,75 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-// 문제 구조체
-struct Problem
-{
-	int deadLine; // 데드라인
-	long long cupRamyeonCnt; // 컵라면 수
+#define home 0
 
-	// 생성자
-	Problem() {}
-	Problem(int d, long long c) : deadLine(d), cupRamyeonCnt(c) {}
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
 
-	// 정렬기준 : 데드라인이 다르면 데드라인 오름차순, 데드라인이 같으면 컵라면 수 내림차순
-	bool operator<(const Problem &problem)const
-	{
-		if (deadLine != problem.deadLine)
-		{
-			return deadLine < problem.deadLine;
-		}
+#define ll long long
+#define ld long double
 
-		return cupRamyeonCnt > problem.cupRamyeonCnt;
-	}
-};
+#define pii pair<int, int>
+#define pll pair<ll, ll>
 
-// 최소힙
-struct Num
-{
-	long long number; // 숫자
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
 
-	// 생성자 
-	Num() {}
-	Num(long long n) : number(n) {}
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
 
-	// 최소힙
-	bool operator<(const Num &num)const
-	{
-		return number > num.number;
-	}
-};
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
 
-// 컵라면 
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+// 컵라면
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n; // N 7
-	cin >> n;
+	int n; cin >> n;
+	vec(pii, v, n);
+	loop(i, home, n) cin >> v[i].lhs >> v[i].rhs;
+	sort(rall(v));
 
-	vector<Problem> schedules(n); // 각 문제 저장
+	priority_queue<int> pq;
+	int pushCnt = home, maxD = v[home].lhs;
 
-	int deadL; // 각 문제 데드라인
-	long long cupR; // 각 문제 컵라면 수
-
-	//	1 6
-	//	1 7
-	//	3 2
-	//	3 1
-	//	2 4
-	//	2 5
-	//	6 1
-	for (int i = 0; i < n; i++)
+	int ans = home;
+	rloop(i, maxD, home)
 	{
-		cin >> deadL >> cupR;
-
-		schedules[i] = Problem(deadL, cupR);
-	}
-
-	// 문제 정렬, 데드라인 오름차순, 컵라면 수 내림차순
-	sort(schedules.begin(), schedules.end());
-
-	priority_queue<Num> minHeap; // 작은 값부터 pop하기 위해 최소 힙 사용
-	long long maxCnt = 0; // 최대 컵라면 수
-
-	for (int i = 0; i < n; i++)
-	{
-		minHeap.push(Num(schedules[i].cupRamyeonCnt)); // 현재 문제의 컵라면 수를 우선순위큐에 저장
-		maxCnt += schedules[i].cupRamyeonCnt; // 현재까지의 최대 컵라면 수에 현재 문제의 컵라면 수를 더함
-
-		// 데드라인을 초과하는 경우
-		// 데드라인을 초과하는 문제 중 가장 작은 컵라면 수를 가진 문제를 제거
-		if (minHeap.size() > schedules[i].deadLine)
+		loop(j, pushCnt, n)
 		{
-			maxCnt -= minHeap.top().number;
-			minHeap.pop();
+			if (v[j].lhs < i) break;
+			pq.push(v[j].rhs);
+			pushCnt++;
+		}
+
+		if (!pq.empty())
+		{
+			ans += pq.top();
+			pq.pop();
 		}
 	}
+	elp(ans);
 
-	cout << maxCnt << '\n';
-
-	return 0;
+	return home;
 }
