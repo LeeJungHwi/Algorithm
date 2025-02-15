@@ -2,62 +2,86 @@
 using namespace std;
 
 #define home 0
-#define ll long long
-#define pll pair<ll, ll>
-#define loop(v, s, e) for(ll v = s; v < e; v++)
-#define elprint(a) cout << a << '\n'
-#define cond(c, t, f) ((c) ? (t) : (f))
-#define X first
-#define Y second
 
-bool comp(const pll &p1, const pll &p2) { return cond(p1.X != p2.X, p1.X < p2.X, p1.Y > p2.Y); }
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+bool comp(const pll & p1, const pll & p2)
+{
+	// 무게 오름차순
+	// 가치 내림차순
+	if (p1.lhs != p2.lhs) return p1.lhs < p2.lhs;
+	return p1.rhs > p2.rhs;
+}
 
 // 보석 도둑
 int main()
 {
-	ios_base::sync_with_stdio(home);
-	cin.tie(home);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	ll n, k;
-	cin >> n >> k;
+	ll n, k; cin >> n >> k;
+	vec(pll, jewel, n);
+	loop(i, home, n) cin >> jewel[i].lhs >> jewel[i].rhs;
+	sort(all(jewel), comp);
 
-	// 보석 => 무게, 가치
-	vector<pll> jewel(n);
-	loop(i, 0, n) cin >> jewel[i].X >> jewel[i].Y;
+	vec(ll, bag, k);
+	loop(i, home, k) cin >> bag[i];
+	sort(all(bag));
 
-	// 가방 => 담을 수 있는 최대 무게
-	vector<ll> bag(k);
-	loop(i, 0, k) cin >> bag[i];
-	sort(bag.begin(), bag.end());
+	priority_queue<ll> pq;
+	ll maxW = bag.back(), pushCnt = home, ans = home;
 
-	// 보석 무게 오름차순
-	// 보석 가치 내림차순
-	sort(jewel.begin(), jewel.end(), comp);
-
-	// 현재 가방에 넣을 수 있는 보석 중 가치가 가장 높은 보석 뽑아냄
-	priority_queue<ll> maxHeap;
-	ll maxValue = 0;
-	ll curIdx = 0;
-
-	loop(i, 0, k)
+	loop(i, home, k)
 	{
-		// 현재 가방에 넣을 수 있는 최대 무게
-		ll maxWeight = bag[i];
-
-		// 현재 가방에 넣을 수 있는 모든 보석 push
-		while (curIdx < n && jewel[curIdx].X <= maxWeight) maxHeap.push(jewel[curIdx++].Y);
-
-		// 그 중 가장 높은 가치의 보석 뽑아서 누적
-		if (!maxHeap.empty())
+		loop(j, pushCnt, n)
 		{
-			maxValue += maxHeap.top();
-			maxHeap.pop();
+			if (jewel[j].lhs > bag[i]) break;
+
+			pq.push(jewel[j].rhs);
+			pushCnt++;
+		}
+
+		if (!pq.empty())
+		{
+			ans += pq.top();
+			pq.pop();
 		}
 	}
-
-	elprint(maxValue);
+	elp(ans);
 
 	return home;
 }
