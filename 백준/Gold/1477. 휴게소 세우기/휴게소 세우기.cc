@@ -45,17 +45,14 @@ int n, m, k;
 bool Check(int s, vector<int> &v)
 {
 	int cnt = home;
+
 	loop(i, 1, v.size())
 	{
 		int dis = v[i] - v[i - 1] - 1;// 현재 구간 거리
-		cnt += dis / s; // s 간격을 유지하면서 필요한 휴게소 개수
-
-		// s 간격을 유지하는데 필요한 휴게소의 개수가 초과되면 X
-		if (cnt > m) return false;
+		cnt += dis / s; // 최대 s간격을 유지하기위해 필요한 휴게소 개수
 	}
 
-	// s 간격을 유지하는데 필요한 휴게소의 개수가 m개 이하면 가능한경우
-	return true;
+	return cnt <= m;
 }
 
 // 휴게소 세우기
@@ -71,8 +68,10 @@ int main()
 	v.push_back(home); v.push_back(k);
 	sort(all(v));
 
+	// 기준 => 두 휴게소 사이 최대 간격
 	// lo => 최소간격 1
 	// hi => 최대간격 k - 1
+	// 최대간격을 s로 유지하면서 필요한 휴게소의 개수가 m개 이하면 가능한경우
 
 	int lo = 1, hi = k - 1, ans = home;
 
@@ -80,7 +79,6 @@ int main()
 	{
 		int s = (lo + hi) / 2;
 
-		// 최대간격을 s로 유지하면서 가능하면 더 작은 s를 탐색
 		if (Check(s, v))
 		{
 			ans = s;
