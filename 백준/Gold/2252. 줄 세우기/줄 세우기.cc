@@ -60,33 +60,25 @@ int main()
 	loop(i, home, n) if (directPre[i] == home) noPre.push(i);
 
 	// 각 학생의 키순서
-	vector<int> ans(n, 1);
+	vector<int> dis(n, 1);
+	tvec(int, order);
 	while (!noPre.empty())
 	{
 		int s = noPre.front();
 		noPre.pop();
+		order.push_back(s);
 
 		loop(i, home, graph[s].size())
 		{
 			int c = graph[s][i];
 
-			ans[c] = max(ans[c], ans[s] + 1);
+			dis[c] = max(dis[c], dis[s] + 1);
 
 			if (--directPre[c] == home) noPre.push(c);
 		}
 	}
 
-	//loop(i, home, n) elp(ans[i]); 1 1 2
-
-	map<int, vector<int>> order;
-	loop(i, home, n) order[ans[i]].push_back(i); // 1 => {0, 1} 2 => {2}
-	mloop(it, order)
-	{
-		loop(i, home, it->rhs.size())
-		{
-			scp(it->rhs[i] + 1);
-		}
-	}
+	loop(i, home, order.size()) scp(order[i] + 1);
 
 	return home;
 }
