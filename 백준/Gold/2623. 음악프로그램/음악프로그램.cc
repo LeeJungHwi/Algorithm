@@ -45,6 +45,7 @@ int main()
 {
 	init;
 
+	// 순서를 정하는 위상정렬 => s 꺼낼때 order에 s 추가
 	int n, m; cin >> n >> m;
 	gmat(int, graph, n);
 	vec(int, directPre, n);
@@ -71,39 +72,25 @@ int main()
 	queue<int> noPre;
 	loop(i, home, n) if (directPre[i] == home) noPre.push(i);
 
-	vector<int> ans(n, 1);
-	int cnt = home;
+	tvec(int, order);
 	while (!noPre.empty())
 	{
 		int s = noPre.front();
 		noPre.pop();
-		cnt++;
+		order.push_back(s);
 
 		loop(i, home, graph[s].size())
 		{
 			int c = graph[s][i];
 
-			ans[c] = max(ans[c], ans[s] + 1);
-
 			if (--directPre[c] == home) noPre.push(c);
 		}
 	}
 
-	//loop(i, home, n) elp(ans[i]);
-
 	// 순서를 정할 수 없으면 0
-	if (cnt != n) { elp(home); return home; }
+	if (order.size() != n) { elp(home); return home; }
 
-	map<int, vector<int>> order;
-	loop(i, home, n) order[ans[i]].push_back(i);
-	
-	mloop(it, order)
-	{
-		loop(i, home, it->rhs.size())
-		{
-			elp(it->rhs[i] + 1);
-		}
-	}
+	loop(i, home, n) elp(order[i] + 1);
 
 	return home;
 }
