@@ -1,98 +1,64 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 숫자 카드 2
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n; // N 10
-	cin >> n;
+	// lb ub
+	int n; cin >> n;
+	vec(int, v, n);
+	loop(i, home, n) cin >> v[i];
+	sort(all(v));
 
-	vector<int> haveCard(n); // 상근이가 가지고 있는 카드
-
-	for (int i = 0; i < n; i++)
+	int m; cin >> m;
+	loop(i, home, m)
 	{
-		cin >> haveCard[i]; // 6 3 2 10 10 10 -10 -10 7 3
+		cin >> n;
+		int l = lower_bound(all(v), n) - v.begin();
+		int h = upper_bound(all(v), n) - v.begin();
+		scp(h - l);
 	}
 
-	sort(haveCard.begin(), haveCard.end()); // -10 -10 2 3 3 6 7 10 10 10
-
-	int m; // M 8
-	cin >> m;
-
-	int findCard; // 찾을 카드 10 9 -5 2 3 4 5 -10
-
-	map<int, int> haveCnt; // (숫자, 횟수) 맵핑
-
-	for (int i = 0; i < m; i++)
-	{
-		cin >> findCard; 
-
-		int first = 0; // 처음
-		int last = n - 1; // 마지막
-		int findCnt = 0; // 찾은횟수
-
-		while (first <= last) // 역전되면 종료
-		{
-			int standard = (first + last) / 2; // 기준값
-
-			if (haveCard[standard] == findCard) // 같으면
-			{
-				if (haveCnt[findCard] > 0) // 이전에 구한적이 있으면 재사용
-				{
-					findCnt = haveCnt[findCard];
-
-					break;
-				}
-
-				for (int i = standard; i > -1; i--) // 기준값부터 왼쪽을 보면서 찾은횟수 카운팅
-				{
-					if (haveCard[i] < findCard) // 찾고자 하는 카드 숫자보다 작으면 종료
-					{
-						break;
-					}
-
-					findCnt++;
-				}
-
-				for (int i = standard; i < n; i++) // 기준값부터 오른쪽을 보면서 찾은횟수 카운팅
-				{
-					if (haveCard[i] > findCard) // 찾고자 하는 카드 숫자보다 크면 종료
-					{
-						break;
-					}
-
-					findCnt++;
-				}
-
-				haveCnt[findCard] = findCnt; // 처음 구한거면 메모
-
-				break;
-			}
-			else if (haveCard[standard] < findCard) // 크면
-			{
-				first = standard + 1; // 처음 갱신
-			}
-			else if (haveCard[standard] > findCard) // 작으면
-			{
-				last = standard - 1; // 마지막 갱신
-			}
-		}
-
-		// 찾은횟수가 카운팅되지않았으면 0 출력
-		// 찾은횟수가 카운팅되었으면 기준값을 두 번 카운팅하므로 1빼줌 
-		cout << (findCnt == 0 ? 0 : findCnt - 1) << ' ';
-	}
-
-	return 0;
+	return home;
 }
