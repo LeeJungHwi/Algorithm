@@ -1,146 +1,91 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 농장 관리
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m; // N, M 8, 7
-	cin >> n >> m;
+	// 봉우리 => 인접한 정점 8개의 정점 집합 중 자신보다 높은 높이를 가지는 정점 집합이 있으면 안됨
+	// 같은 높이의 정점은 하나의 봉우리 집합으로침
 
-	vector<vector<int> > graph(n, vector<int>(m)); // 그래프
-	vector<vector<bool> > vis(n, vector<bool>(m)); // 방문체크
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 8방향
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-	checkDir.push_back({ -1, -1 });
-	checkDir.push_back({ -1, 1 });
-	checkDir.push_back({ 1, -1 });
-	checkDir.push_back({ 1, 1 });
+	int n, m; cin >> n >> m;
+	mat(int, graph, n, m);
+	mat(bool, vis, n, m);
+	loop(i, home, n) loop(j, home, m) cin >> graph[i][j];
+	queue<pii> cp; dir;
 
-	//	4 3 2 2 1 0 1
-	//	3 3 3 2 1 0 1
-	//	2 2 2 2 1 0 0
-	//	2 1 1 1 1 0 0
-	//	1 1 0 0 0 1 0
-	//	0 0 0 1 1 1 0
-	//	0 1 2 2 1 1 0
-	//	0 1 1 1 2 1 0
-	for (int i = 0; i < n; i++)
+	int ans = home; // 봉우리 개수
+	loop(i, home, n) loop(j, home, m) if (!vis[i][j] && graph[i][j] > home)
 	{
-		for (int j = 0; j < m; j++)
-		{
-			cin >> graph[i][j];
-		}
-	}
+		cp.push({ i, j });
+		vis[i][j] = true;
+		bool isPeek = true; // 현재 정점이 봉우리인지 체크
 
-	int peekCnt = 0; // 봉우리 개수
-
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
+		// 현재 정점과 인접한 8개의 정점 집합 체크
+		while (!cp.empty())
 		{
-			if (graph[i][j] > 0 && !vis[i][j])
+			int si = cp.front().lhs;
+			int sj = cp.front().rhs;
+			cp.pop();
+
+			loop(k, home, 8)
 			{
-				// BFS
-				checkPos.push({ i, j });
-				vis[i][j] = true;
-				bool isPeek = true;
-				int curPeek = graph[i][j];
-				vector<pair<int, int> > peekSet;
-				peekSet.push_back({ i, j });
+				int ci = si + cd[k].lhs;
+				int cj = sj + cd[k].rhs;
 
-				while (!checkPos.empty()) // 큐가 빌때까지
-				{
-					// 기준위치 꺼냄
-					pair<int, int> standardPos = checkPos.front();
-					checkPos.pop();
+				if (ci < home || cj < home || ci >= n || cj >= m) continue;
+				if (graph[ci][cj] > graph[si][sj]) isPeek = false; // 현재 봉우리보다 높은 정점 집합이 있으면 봉우리 X
+				if (vis[ci][cj]) continue;
+				if (graph[ci][cj] != graph[i][j]) continue; // 현재 방향의 정점과 같은 높이로 연결된 정점은 같은 봉우리 집합
 
-					// 8방향
-					for (int k = 0; k < 8; k++)
-					{
-						// 체크 할 위치
-						int checkI = standardPos.first + checkDir[k].first;
-						int checkJ = standardPos.second + checkDir[k].second;
-
-						// 경계체크
-						if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m)
-						{
-							continue;
-						}
-
-						// 방문체크
-						if (vis[checkI][checkJ])
-						{
-							continue;
-						}
-
-						// 다른높이체크
-						if (graph[checkI][checkJ] != curPeek)
-						{
-							continue;
-						}
-
-						// 큐에저장, 방문체크, 봉우리집합저장
-						checkPos.push({ checkI, checkJ });
-						vis[checkI][checkJ] = true;
-						peekSet.push_back({ checkI, checkJ });
-					}
-				}
-
-				// 봉우리집합 돌면서
-				for (int k = 0; k < peekSet.size(); k++)
-				{
-					// 기준위치
-					pair<int, int> standardPos = peekSet[k];
-
-					// 더 높은 높이가 있으면 봉우리 아님
-					for (int l = 0; l < 8; l++)
-					{
-						int checkI = standardPos.first + checkDir[l].first;
-						int checkJ = standardPos.second + checkDir[l].second;
-
-						if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m)
-						{
-							continue;
-						}
-
-						if (graph[checkI][checkJ] > curPeek)
-						{
-							isPeek = false;
-							break;
-						}
-					}
-
-					if (!isPeek)
-					{
-						break;
-					}
-				}
-
-				// 봉우리면 카운팅
-				if (isPeek)
-				{
-					peekCnt++;
-				}
+				cp.push({ ci, cj });
+				vis[ci][cj] = true;
 			}
 		}
+
+		if (isPeek) ans++; // 현재 정점이 봉우리인 경우 카운팅
 	}
+	elp(ans);
 
-	cout << peekCnt << '\n';
-
-	return 0;
+	return home;
 }
