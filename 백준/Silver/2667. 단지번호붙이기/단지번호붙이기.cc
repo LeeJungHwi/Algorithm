@@ -1,133 +1,89 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-// 단지번호 붙이기
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define pll pair<ll, ll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+// 단지번호붙이기
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n; // N 7
-	cin >> n;
+	int n; cin >> n;
+	mat(char, graph, n, n);
+	mat(bool, vis, n, n);
+	loop(i, home, n) loop(j, home, n) cin >> graph[i][j];
+	queue<pii> cp; dir;
 
-	vector<vector<int> > graph(n, vector<int>(n)); // 그래프
-	vector<vector<bool> > vis(n, vector<bool>(n)); // 방문체크
-	vector<int> houseCnts; // 각 단지별 집 수 저장
-
-	string inputString; // 입력이 스트링으로 들어옴
-
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	//	0110100
-	//	0110101
-	//	1110101
-	//	0000111
-	//	0100000
-	//	0111110
-	//	0111000
-	for (int i = 0; i < n; i++)
+	tvec(int, ans); // 각 영역 크기
+	loop(i, home, n) loop(j, home, n) if (!vis[i][j] && graph[i][j] == '1')
 	{
-		cin >> inputString;
+		cp.push({ i, j });
+		vis[i][j] = true;
+		int cnt = 1; // 현재 영역 크기
 
-		for (int j = 0; j < n; j++)
+		while (!cp.empty())
 		{
-			graph[i][j] = inputString[j] - '0';
-		}
-	}
+			int si = cp.front().lhs;
+			int sj = cp.front().rhs;
+			cp.pop();
 
-	// BFS
-	// 그래프를 돌면서 1을 만나면 방문체크, 큐에 저장 후 방문체크
-	// 큐가 빌때까지 돌면서 경계체크, 방문체크, 0체크, 1을 만나면 큐에 저장 후 방문체크, 집 수 증가
-	// 한 스텝이 끝나면 단지 수 증가
-
-	int blockCnt = 0; // 단지 수
-
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			if (graph[i][j] == 1) // 1을 만나면
+			loop(k, home, 4)
 			{
-				// 방문체크
-				if (vis[i][j])
-				{
-					continue;
-				}
+				int ci = si + cd[k].lhs;
+				int cj = sj + cd[k].rhs;
 
-				// 큐에 저장 후 방문체크
-				checkPos.push({ i, j });
-				vis[i][j] = true;
+				if (ci < home || cj < home || ci >= n || cj >= n) continue;
+				if (vis[ci][cj]) continue;
+				if (graph[ci][cj] == '0') continue;
 
-				// 집 수
-				int houseCnt = 1;
-
-				while (!checkPos.empty()) // 큐가 빌때까지
-				{
-					// 기준위치 꺼냄
-					pair<int, int> standardPos = checkPos.front();
-					checkPos.pop();
-
-					// 상하좌우
-					for (int k = 0; k < 4; k++)
-					{
-						// 체크 할 위치
-						int checkI = standardPos.first + checkDir[k].first;
-						int checkJ = standardPos.second + checkDir[k].second;
-
-						// 경계체크
-						if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= n)
-						{
-							continue;
-						}
-
-						// 방문체크
-						if (vis[checkI][checkJ])
-						{
-							continue;
-						}
-
-						// 0체크
-						if (graph[checkI][checkJ] == 0)
-						{
-							continue;
-						}
-
-						// 1을 만나면 큐에 저장 후 방문체크, 집 수 증가
-						checkPos.push({ checkI, checkJ });
-						vis[checkI][checkJ] = true;
-						houseCnt++;
-					}
-				}
-
-				houseCnts.push_back(houseCnt); // 각 단지의 집 수가 저장됨
-				blockCnt++; // 단지 수 증가
+				cp.push({ ci, cj });
+				vis[ci][cj] = true;
+				cnt++; // 현재 영역 크기 카운팅
 			}
 		}
+
+		ans.push_back(cnt); // 현재 영역 크기 저장
 	}
 
-	// 단지 수 출력
-	cout << blockCnt << '\n';
+	elp(ans.size()); sort(all(ans));
+	loop(i, home, ans.size()) elp(ans[i]);
 
-	// 각 단지의 집 수 오름차순 출력
-
-	sort(houseCnts.begin(), houseCnts.end());
-
-	for (int i = 0; i < houseCnts.size(); i++)
-	{
-		cout << houseCnts[i] << '\n';
-	}
-
-	return 0;
+	return home;
 }
