@@ -1,153 +1,130 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 불!
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int r, c; // R, C 4, 4
-	cin >> r >> c;
+	// 불 멀티 소스 BFS
+	// 지훈 BFS
+	// 경계를 만나면 탈출
+	// 불이 더 빨리 도착하거나 동시에 도착하면 X
 
-	vector<vector<char> > graph(r, vector<char>(c)); // 그래프
-	vector<vector<int> > dis(r, vector<int>(c)); // 거리 체크
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	//####
-	//#JF#
-	//#..#
-	//#..#
-
-	string inputString; // 입력 문자열
-	pair<int, int> jihunPos; // 지훈이 시작위치
-
-	for (int i = 0; i < r; i++)
+	int n, m; cin >> n >> m;
+	mat(char, graph, n, m);
+	mat(int, dis, n, m);
+	queue<pii> cp; dir;
+	pii sPos;
+	loop(i, home, n) loop(j, home, m)
 	{
-		cin >> inputString;
+		cin >> graph[i][j];
 
-		for (int j = 0; j < c; j++)
+		// 불 멀티 소스 BFS
+		if (graph[i][j] == 'F')
 		{
-			graph[i][j] = inputString[j];
+			cp.push({ i, j });
+			dis[i][j] = 1;
+		}
+		// 지훈 위치
+		else if (graph[i][j] == 'J') sPos = { i, j };
+	}
 
-			// 불 먼저 BFS 돌리기위해 큐에 저장, 거리 1
-			if (graph[i][j] == 'F')
-			{
-				checkPos.push({ i, j });
-				dis[i][j] = 1;
-			}
-			else if (graph[i][j] == 'J') // 지훈이도 BFS 돌리기위해 위치 저장
-			{
-				jihunPos = { i, j };
-			}
+	// 불 멀티 소스 BFS
+	while (!cp.empty())
+	{
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop();
+
+		loop(i, home, 4)
+		{
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
+
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (dis[ci][cj] > home) continue;
+			if (graph[ci][cj] == '#') continue;
+
+			cp.push({ ci, cj });
+			dis[ci][cj] = dis[si][sj] + 1;
 		}
 	}
 
-	// 불 먼저 BFS 돌리고
-	while (!checkPos.empty()) // 큐가 빌때까지
+	// 지훈 BFS
+	cp.push(sPos);
+	dis[sPos.lhs][sPos.rhs] = 1;
+
+	while (!cp.empty())
 	{
-		// 기준위치 꺼냄
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop();
 
-		// 상하좌우
-		for (int i = 0; i < 4; i++)
+		loop(i, home, 4)
 		{
-			// 체크 할 위치
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
 
-			// 경계체크
-			if (checkI < 0 || checkJ < 0 || checkI >= r || checkJ >= c)
+			// 경계를 만나면 탈출
+			if (ci < home || cj < home || ci >= n || cj >= m)
 			{
-				continue;
+				elp(dis[si][sj]);
+				return home;
 			}
 
-			// 벽체크
-			if (graph[checkI][checkJ] == '#')
-			{
-				continue;
-			}
+			// 불이 먼저 도착하거나 동시에 도착하면 X
+			if (dis[ci][cj] > home && dis[ci][cj] <= dis[si][sj] + 1) continue;
+			if (graph[ci][cj] == '#') continue;
 
-			// 방문체크(거리로)
-			if (dis[checkI][checkJ] > 0)
-			{
-				continue;
-			}
-
-			// 큐에저장, 거리저장
-			checkPos.push({ checkI, checkJ });
-			dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
+			cp.push({ ci, cj });
+			dis[ci][cj] = dis[si][sj] + 1;
 		}
 	}
+	elp("IMPOSSIBLE");
 
-	// 디버깅용
-	//for (auto a : dis)
-	//{
-	//	for (auto b : a)
-	//	{
-	//		cout << b << ' ';
-	//	}
-	//	cout << '\n';
-	//}
-
-	// 지훈이를 BFS 돌리면서 최단거리일때만 큐에저장 거리저장 하면서 나가다가 경계를 만나면
-	// 탈출시간에 거리 저장, 저장된 거리가 0이면 탈출 불가능하므로 IMPOSSIBLE 출력 아니면 탈출시간 출력
-
-	checkPos.push(jihunPos);
-	dis[jihunPos.first][jihunPos.second] = 1;
-
-	while (!checkPos.empty()) // 큐가 빌때까지
-	{
-		// 기준위치 꺼냄
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
-
-		// 상하좌우
-		for (int i = 0; i < 4; i++)
-		{
-			// 체크 할 위치
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
-
-			// 경계체크(탈출 가능)
-			if (checkI < 0 || checkJ < 0 || checkI >= r || checkJ >= c)
-			{
-				cout << dis[standardPos.first][standardPos.second] << '\n';
-
-				return 0;
-			}
-
-			// 벽체크
-			if (graph[checkI][checkJ] == '#')
-			{
-				continue;
-			}
-
-			// 최단거리이거나 불이 퍼지지않은곳이면 갱신
-			if (dis[checkI][checkJ] > dis[standardPos.first][standardPos.second] + 1 || dis[checkI][checkJ] == 0)
-			{
-				checkPos.push({ checkI, checkJ });
-				dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-			}
-		}
-	}
-
-	// 지훈이의 BFS가 끝나고도 탈출하지못하면 탈출불가능
-	cout << "IMPOSSIBLE" << '\n';
-
-	return 0;
+	return home;
 }
