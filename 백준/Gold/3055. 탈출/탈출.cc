@@ -1,174 +1,133 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 탈출
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int r, c; // R, C 3, 6
-	cin >> r >> c;
+	// 물 멀티 소스 BFS
+	// 고슴도치 BFS
+	// 비버의 굴 만나면 탈출(비버 굴은 물이 차지 않음)
+	// 물이 더 빠르게 도착하거나 동시에 도착하면 X
 
-	vector<vector<char> > graph(r, vector<char>(c)); // 그래프
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	string inputString; // 입력문자열
-
-	pair<int, int> dPos; // 비버굴 위치
-	pair<int, int> sPos; // 고슴도치 위치
-	vector<vector<int> > wDis(r, vector<int>(c)); // 물 거리
-	wDis[dPos.first][dPos.second] = 2147000000; // 비버굴의 물 거리는 max값으로 둬야 고슴도치 BFS 돌릴때 거리 구해짐
-
-	//	D...*.
-	//	.X.X..
-	//	....S.
-	// 비버굴 위치, 고슴도치 위치 저장
-	// 물 위치는 먼저 BFS 돌리기 위해 큐에 바로 저장 후 거리 1
-	for (int i = 0; i < r; i++)
+	int n, m; cin >> n >> m;
+	mat(char, graph, n, m);
+	mat(int, dis, n, m);
+	queue<pii> cp; dir;
+	pii sPos;
+	loop(i, home, n) loop(j, home, m)
 	{
-		cin >> inputString;
-
-		for (int j = 0; j < inputString.size(); j++)
+		cin >> graph[i][j];
+		
+		// 물 멀티 소스 BFS
+		if (graph[i][j] == '*')
 		{
-			graph[i][j] = inputString[j];
+			cp.push({ i, j });
+			dis[i][j] = 1;
+		}
+		// 고슴도치 위치
+		else if (graph[i][j] == 'S') sPos = { i, j };
+	}
 
-			if (graph[i][j] == 'D')
-			{
-				dPos = { i, j };
-			}
-			else if (graph[i][j] == 'S')
-			{
-				sPos = { i, j };
-			}
-			else if (graph[i][j] == '*')
-			{
-				checkPos.push({ i, j });
-				wDis[i][j] = 1;
-			}
+	// 물 멀티 소스 BFS
+	while (!cp.empty())
+	{
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop();
+
+		loop(i, home, 4)
+		{
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
+
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (dis[ci][cj] > home) continue;
+			if (graph[ci][cj] == 'X') continue;
+			// 비버 굴은 물이 차지 않음
+			if (graph[ci][cj] == 'D') continue;
+
+			cp.push({ ci, cj });
+			dis[ci][cj] = dis[si][sj] + 1;
 		}
 	}
 
-	// 물 BFS 돌리면서 거리 저장
-	// 고슴도치 BFS 돌리면서 거리 저장
+	// 고슴도치 BFS
+	cp.push(sPos);
+	dis[sPos.lhs][sPos.rhs] = 1;
 
-	// 물 BFS 돌리면서 거리 저장
-	while (!checkPos.empty()) // 큐가 빌때까지
+	while (!cp.empty())
 	{
-		// 기준위치 꺼냄
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop();
 
-		for (int i = 0; i < 4; i++)
+		// 비버 굴 만나면 탈출
+		if (graph[si][sj] == 'D')
 		{
-			// 체크 할 위치
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
+			elp(dis[si][sj] - 1);
+			return home;
+		}
 
-			// 경계체크
-			if (checkI < 0 || checkJ < 0 || checkI >= r || checkJ >= c)
-			{
-				continue;
-			}
+		loop(i, home, 4)
+		{
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
 
-			// 돌체크
-			if (graph[checkI][checkJ] == 'X')
-			{
-				continue;
-			}
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			// 물이 더 빠르게 도착하거나 동시에 도착하면 X
+			if (dis[ci][cj] > home && dis[ci][cj] <= dis[si][sj] + 1) continue;
+			if (graph[ci][cj] == 'X') continue;
 
-			// 비버굴체크
-			if (graph[checkI][checkJ] == 'D')
-			{
-				continue;
-			}
-
-			// 거리가 할당되어있지않다면 큐에 저장 후 거리 저장
-			if (wDis[checkI][checkJ] == 0)
-			{
-				checkPos.push({ checkI, checkJ });
-				wDis[checkI][checkJ] = wDis[standardPos.first][standardPos.second] + 1;
-			}
-			else // 거리가 할당되어있다면 최소인경우만 큐에 저장 후 거리 저장
-			{
-				if (wDis[checkI][checkJ] > wDis[standardPos.first][standardPos.second] + 1)
-				{
-					checkPos.push({ checkI, checkJ });
-					wDis[checkI][checkJ] = wDis[standardPos.first][standardPos.second] + 1;
-				}
-			}
+			cp.push({ ci, cj });
+			dis[ci][cj] = dis[si][sj] + 1;
 		}
 	}
+	elp("KAKTUS");
 
-	// 고슴도치 BFS 돌리면서 거리 저장
-	vector<vector<int> > sDis(r, vector<int>(c)); // 고슴도치 거리
-	checkPos.push(sPos);
-	sDis[sPos.first][sPos.second] = 1;
-
-	while (!checkPos.empty()) // 큐가 빌때까지
-	{
-		// 기준위치 꺼냄
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
-
-		for (int i = 0; i < 4; i++)
-		{
-			// 체크 할 위치
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
-
-			// 경계체크
-			if (checkI < 0 || checkJ < 0 || checkI >= r || checkJ >= c)
-			{
-				continue;
-			}
-
-			// 방문체크(거리로)
-			if (sDis[checkI][checkJ] > 0)
-			{
-				continue;
-			}
-
-			// 돌체크
-			if (graph[checkI][checkJ] == 'X')
-			{
-				continue;
-			}
-
-			// 물거리체크 : 고슴도치가 물보다 더 최단시간으로 가면서 물 거리가 할당되어 있는지 체크
-			if (sDis[standardPos.first][standardPos.second] + 1 >= wDis[checkI][checkJ] && wDis[checkI][checkJ] != 0)
-			{
-				continue;
-			}
-
-			// 큐에 저장 후 거리 저장
-			checkPos.push({ checkI, checkJ });
-			sDis[checkI][checkJ] = sDis[standardPos.first][standardPos.second] + 1;
-		}
-	}
-
-	// 고슴도치 거리의 비버굴위치 거리가 저장되어있지않으면 이동할수없음
-	if (sDis[dPos.first][dPos.second] == 0)
-	{
-		cout << "KAKTUS" << '\n';
-
-		return 0;
-	}
-
-	// 1로 시작했으므로 1 빼줌
-	cout << sDis[dPos.first][dPos.second] - 1 << '\n';
-
-	return 0;
+	return home;
 }
