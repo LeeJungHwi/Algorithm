@@ -1,110 +1,121 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-struct Corn
-{
-	int value;
-	pair<int, int> pos;
+#define home 0
 
-	Corn() {}
-	Corn(int val, pair<int, int> p) : value(val), pos(p) {}
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
 
-	bool operator<(const Corn &corn) const
-	{
-		return value < corn.value;
-	}
-};
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 옥수수밭
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	// 옥수수 구조체 => 가치, 위치
-	// 우선순위 큐에 그래프 가장자리 옥수수 저장 => 가치 높은 순
-	// 우선순위 큐에서 k번 꺼냄
-	// 각 스텝에서 꺼낼 때 꺼낸 옥수수의 상하좌우 옥수수를 우선순위 큐에 저장
+	// 현재 수확할 수 있는 옥수수 중 가장 가치가 높은 옥수수를 k번 수확함
+	// 가장자리 옥수수 최대힙에 저장
+	// k번 꺼내면서 꺼낸 옥수수의 상하좌우 옥수수를 최대힙에 저장
 
-	// 초기화
-	int n, m;
-	cin >> n >> m;
-	vector<vector<int> > graph(n + 2, vector<int>(m + 2));
-	vector<vector<bool> > vis(n + 2, vector<bool>(m + 2));
-	queue<pair<int, int> > checkInitPos;
-	checkInitPos.push({ 0, 0 });
-	vis[0][0] = true;
-	priority_queue<Corn> checkPos;
-	vector<pair<int, int> > checkDir;
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
+	int n, m; cin >> n >> m;
+	mat(int, graph, n, m);
+	mat(bool, vis, n, m);
+	priority_queue<piii> pq; dir; // (가치, 위치)
+	loop(i, home, n) loop(j, home, m) cin >> graph[i][j];
+	int k; cin >> k;
 
-	for (int i = 1; i < n + 1; i++)
+	// 가장자리 옥수수 최대힙에 저장
+	loop(i, home, n)
 	{
-		for (int j = 1; j < m + 1; j++)
+		// 첫 열
+		if (!vis[i][home])
 		{
-			cin >> graph[i][j];
+			pq.push({ graph[i][home],{i, home} });
+			vis[i][home] = true;
+		}
+
+		// 마지막 열
+		if (!vis[i][m - 1])
+		{
+			pq.push({ graph[i][m - 1], {i, m - 1} });
+			vis[i][m - 1] = true;
+		}
+	}
+	loop(i, home, m)
+	{
+		// 첫 행
+		if (!vis[home][i])
+		{
+			pq.push({ graph[home][i],{home, i} });
+			vis[home][i] = true;
+		}
+		
+		// 마지막 행
+		if (!vis[n - 1][i])
+		{
+			pq.push({ graph[n - 1][i], {n - 1, i} });
+			vis[n - 1][i] = true;
 		}
 	}
 
-	// 가장자리
-	while (!checkInitPos.empty())
-	{
-		pair<int, int> standardPos = checkInitPos.front();
-		checkInitPos.pop();
-
-		for (int i = 0; i < 4; i++)
-		{
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
-
-			if (checkI < 0 || checkJ < 0 || checkI >= n + 2 || checkJ >= m + 2) continue;
-			if (vis[checkI][checkJ]) continue;
-
-			if (graph[checkI][checkJ] == 0) checkInitPos.push({ checkI, checkJ });
-			if (graph[checkI][checkJ] > 0) checkPos.push(Corn(graph[checkI][checkJ], { checkI, checkJ }));
-			vis[checkI][checkJ] = true;
-		}
-	}
-
-	//while (!checkPos.empty())
-	//{
-	//	cout << checkPos.top().value << '\n';
-	//	checkPos.pop();
-	//}
-
-	int k;
-	cin >> k;
-
-	// 각 스텝
+	// k번 꺼내면서 꺼낸 옥수수의 상하좌우 옥수수를 최대힙에 저장
 	while (k--)
 	{
-		pair<int, int> standardPos = checkPos.top().pos;
-		checkPos.pop();
-		cout << standardPos.first << ' ' << standardPos.second << '\n';
+		int si = pq.top().rhs.lhs;
+		int sj = pq.top().rhs.rhs;
+		pq.pop();
 
-		for (int i = 0; i < 4; i++)
+		// 가장 가치가 높은 옥수수 수확
+		scp(si + 1); elp(sj + 1);
+
+		loop(i, home, 4)
 		{
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
 
-			if (checkI < 1 || checkJ < 1 || checkI >= n + 1 || checkJ >= m + 1) continue;
-			if (vis[checkI][checkJ]) continue;
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (vis[ci][cj]) continue;
 
-			checkPos.push(Corn(graph[checkI][checkJ], { checkI, checkJ }));
-			vis[checkI][checkJ] = true;
+			pq.push({ graph[ci][cj], {ci, cj} });
+			vis[ci][cj] = true;
 		}
 	}
 
-	return 0;
+	return home;
 }
