@@ -1,326 +1,126 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 치즈
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m; // N, M 8, 9
-	cin >> n >> m;
+	// 치즈 내부공기가 아닌 외부공기와 2개 이상 닿아있는 치즈는 녹음 => 한번에 없애야함
+	// 공기를 만나면 BFS 돌려서 치즈를 만나면 녹일 치즈에 저장해서 한번에 녹임
+	// 공기가 경계를 만나지 않으면 치즈 내부공기이므로 녹이지 않음
+	// 남아있는 치즈 개수와 녹일 치즈의 개수가 같으면 종료
 
-	vector<vector<int> > graph(n, vector<int>(m)); // 그래프
-	vector<vector<bool> > vis(n, vector<bool>(m)); // 방문체크
-	vector<pair<int, int> > innerAir; // 치즈 내부공기 저장
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	//	0 0 0 0 0 0 0 0 0
-	//	0 0 0 1 1 0 0 0 0
-	//	0 0 0 1 1 0 1 1 0
-	//	0 0 1 1 1 1 1 1 0
-	//	0 0 1 1 1 1 1 0 0
-	//	0 0 1 1 0 1 1 0 0
-	//	0 0 0 0 0 0 0 0 0
-	//	0 0 0 0 0 0 0 0 0
-	for (int i = 0; i < n; i++)
+	int n, m; cin >> n >> m;
+	mat(int, graph, n, m);
+	mat(bool, vis, n, m);
+	queue<pii> cp; dir;
+	int cheeseCnt = home; // 남아있는 치즈 개수
+	loop(i, home, n) loop(j, home, m)
 	{
-		for (int j = 0; j < m; j++)
-		{
-			cin >> graph[i][j];
-		}
+		cin >> graph[i][j];
+		if (graph[i][j] == 1) cheeseCnt++;
 	}
 
-	// 1. 치즈 내부공기 판별하기
-	// 그래프 돌면서 공기를만나면 BFS 돌리다가
-	// 경계를 만나면 경계를 만났다고 체크
-	// 만약 경계를 만난적이없다면 치즈내부공기이므로 저장
-
-	// 2. 치즈가 모두녹기까지 걸리는시간++
-
-	// 3. 녹아서 없어질 치즈좌표 구하기
-	// 그래프를 돌다가 치즈를만나면 치즈개수++
-	// 상하좌우 체크해서 치즈내부공기가 아닌 공기를 두개이상 만나면
-	// 녹아서 없어질 치즈좌표로 저장
-
-	// 4.
-	// 만약 녹아서없어질 치즈좌표개수와 치즈개수가 같으면 시간 출력 후 종료
-	// 다르면 녹아서 없어질 치즈좌표 0으로
-
-	// 1. 치즈 내부공기 판별하기
-	for (int i = 1; i < n - 1; i++) // 어차피 가장자리는 0이므로 1~n-1
-	{
-		for (int j = 1; j < m - 1; j++) // 1~m-1 돌면서
-		{
-			if (graph[i][j] == 0) // 공기를 만나면
-			{
-				bool isBorder = false; // 가장자리를 만났는지 체크
-
-				// 해당 공기부터 BFS 돌리기
-				checkPos.push({ i,j });
-				vis[i][j] = true;
-
-				while (!checkPos.empty()) // 큐가 빌때까지
-				{
-					// 기준위치 꺼냄
-					pair<int, int> standardPos = checkPos.front();
-					checkPos.pop();
-
-					// 상하좌우
-					for (int k = 0; k < 4; k++)
-					{
-						// 체크 할 위치
-						int checkI = standardPos.first + checkDir[k].first;
-						int checkJ = standardPos.second + checkDir[k].second;
-
-						// 가장자리체크
-						if (checkI < 1 || checkJ < 1 || checkI >= n - 1 || checkJ >= m - 1)
-						{
-							// 가장자리 만남
-							isBorder = true;
-							break;
-						}
-
-						// 방문체크
-						if (vis[checkI][checkJ])
-						{
-							continue;
-						}
-
-						// 치즈체크
-						if (graph[checkI][checkJ] == 1)
-						{
-							continue;
-						}
-
-						// 공기체크
-						checkPos.push({ checkI, checkJ });
-						vis[checkI][checkJ] = true;
-					}
-
-					// 경계를만났다면 break
-					if (isBorder)
-					{
-						break;
-					}
-				}
-
-				// 만약 경계를 만난적이 없다면 치즈내부 공기이므로 저장
-				if (!isBorder)
-				{
-					innerAir.push_back({ i, j });
-				}
-
-				// 큐 초기화
-				while (!checkPos.empty())
-				{
-					checkPos.pop();
-				}
-
-				// vis 초기화
-				for (int k = 0; k < n; k++)
-				{
-					for (int l = 0; l < m; l++)
-					{
-						vis[k][l] = false;
-					}
-				}
-			}
-		}
-	}
-
-	int time = 0; // 모두녹는데 걸리는시간
-
+	int ans = home; // 치즈를 모두 녹이는데 걸리는 시간
 	while (true)
 	{
-		vector<pair<int, int> > meltCheese; // 녹아서 없어질 치즈좌표 저장
-		vector<pair<int, int> > nextInnerAir; // 다음 체크 할 치즈 내부공기
+		ans++; // 1시간 후
+		tvec(pii, realMeltCheese); // 진짜로 녹일 치즈
 
-		for (int i = 0; i < innerAir.size(); i++)
+		// 공기를 만나면
+		loop(i, home, n) loop(j, home, m) if (!vis[i][j] && graph[i][j] == home)
 		{
-			bool isBorder = false; // 가장자리를 만났는지 체크
+			cp.push({ i, j });
+			vis[i][j] = true;
 
-			// 해당 공기부터 BFS 돌리기
-			checkPos.push(innerAir[i]);
-			vis[innerAir[i].first][innerAir[i].second] = true;
-
-			while (!checkPos.empty()) // 큐가 빌때까지
+			bool isBorder = false; // 공기가 경계를 만나는지 체크
+			map<pii, int> meltCheese; // 녹일치즈 (위치, 외부공기 닿은 횟수)
+			while (!cp.empty())
 			{
-				// 기준위치 꺼냄
-				pair<int, int> standardPos = checkPos.front();
-				checkPos.pop();
+				int si = cp.front().lhs;
+				int sj = cp.front().rhs;
+				cp.pop();
 
-				// 상하좌우
-				for (int k = 0; k < 4; k++)
+				loop(k, home, 4)
 				{
-					// 체크 할 위치
-					int checkI = standardPos.first + checkDir[k].first;
-					int checkJ = standardPos.second + checkDir[k].second;
+					int ci = si + cd[k].lhs;
+					int cj = sj + cd[k].rhs;
 
-					// 가장자리체크
-					if (checkI < 1 || checkJ < 1 || checkI >= n - 1 || checkJ >= m - 1)
+					// 경계를 만나는지 체크
+					if (ci < home || cj < home || ci >= n || cj >= m) { isBorder = true; continue; }
+					if (vis[ci][cj]) continue;
+					// 치즈를 만나면 녹일 치즈 외부공기 닿은 횟수 카운팅
+					if (graph[ci][cj] == 1)
 					{
-						// 가장자리 만남
-						isBorder = true;
-						break;
-					}
-
-					// 방문체크
-					if (vis[checkI][checkJ])
-					{
+						meltCheese[{ci, cj}]++;
 						continue;
 					}
 
-					// 치즈체크
-					if (graph[checkI][checkJ] == 1)
-					{
-						continue;
-					}
-
-					// 공기체크
-					checkPos.push({ checkI, checkJ });
-					vis[checkI][checkJ] = true;
-				}
-
-				// 경계를만났다면 break
-				if (isBorder)
-				{
-					break;
+					cp.push({ ci, cj });
+					vis[ci][cj] = true;
 				}
 			}
 
-			// 만약 경계를 만난적이 없다면 치즈내부 공기이므로 저장
-			if (!isBorder)
-			{
-				nextInnerAir.push_back(innerAir[i]);
-			}
-
-			// 큐 초기화
-			while (!checkPos.empty())
-			{
-				checkPos.pop();
-			}
-
-			// vis 초기화
-			for (int k = 0; k < n; k++)
-			{
-				for (int l = 0; l < m; l++)
-				{
-					vis[k][l] = false;
-				}
-			}
+			// 경계를 만난 공기에 2번 이상 닿은 치즈만 녹음
+			if (isBorder) mloop(it, meltCheese)
+				if (it->rhs >= 2) realMeltCheese.push_back({it->lhs.lhs, it->lhs.rhs});
 		}
 
-		// 디버깅용
-		//for (int i = 0; i < innerAir.size(); i++)
-		//{
-		//	cout << innerAir[i].first << ' ' << innerAir[i].second << ' ';
-		//}
-		//cout << '\n';
+		// 남아있는 치즈 개수와 녹일 치즈 개수가 같다면 종료
+		if (cheeseCnt == realMeltCheese.size()) { elp(ans); return home; }
 
-		// 2. 치즈가 모두녹기까지 걸리는시간++
-		time++;
-
-		// 3. 녹아서 없어질 치즈좌표 구하기
-		// 그래프를 돌다가 치즈를만나면 치즈개수++
-		// 상하좌우 체크해서 치즈내부공기가 아닌 공기를 두개이상 만나면
-		// 녹아서 없어질 치즈좌표로 저장
-
-		int cheeseCnt = 0; // 치즈개수
-
-		for (int i = 0; i < n; i++) // 그래프 돌다가
-		{
-			for (int j = 0; j < m; j++)
-			{
-				if (graph[i][j] == 1) // 치즈를 만나면
-				{
-					cheeseCnt++; // 치즈개수++
-					int outerAirCnt = 0; // 치즈 외부 공기를 만난 횟수
-
-					// 상하좌우 체크
-					for (int k = 0; k < 4; k++)
-					{
-						// 치즈 내부공기인지 체크
-						bool isInner = false;
-
-						// 체크 할 위치
-						int checkI = i + checkDir[k].first;
-						int checkJ = j + checkDir[k].second;
-
-						// 공기를 만나면
-						if (graph[checkI][checkJ] == 0)
-						{
-							// 치즈 내부공기 체크
-							for (int l = 0; l < nextInnerAir.size(); l++)
-							{
-								if (checkI == nextInnerAir[l].first && checkJ == nextInnerAir[l].second)
-								{
-									isInner = true;
-									break;
-								}
-							}
-
-							// 치즈 내부공기면 continue
-							if (isInner)
-							{
-								continue;
-							}
-
-							outerAirCnt++; // 외부 공기 접촉 횟수 카운팅
-
-							if (outerAirCnt == 2) // 외부공기를 두 개 접촉하면 
-							{
-								// 치즈 내부공기가 아니면 없어질 치즈좌표에 저장
-								meltCheese.push_back({ i, j });
-
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		innerAir = nextInnerAir;
-
-		// 디버깅용
-		//for (int i = 0; i < meltCheese.size(); i++)
-		//{
-		//	cout << meltCheese[i].first << ' ' << meltCheese[i].second << ' ';
-		//}
-		//cout << '\n';
-
-		// 4.
-		// 만약 녹아서없어질 치즈좌표개수와 치즈개수가 같으면 시간 출력 후 종료
-		// 다르면 녹아서 없어질 치즈좌표 0으로
-
-		// 만약 녹아서없어질 치즈좌표개수와 치즈개수가 같으면 시간 출력 후 종료
-		if (meltCheese.size() == cheeseCnt)
-		{
-			cout << time << '\n';
-
-			return 0;
-		}
-
-		// 다르면 녹아서 없어질 치즈좌표 0으로
-		for (int i = 0; i < meltCheese.size(); i++)
-		{
-			graph[meltCheese[i].first][meltCheese[i].second] = 0;
-		}
+		// 아직 모두 녹이지 못하면
+		// 남아있는 치즈 개수 감소
+		// 치즈 녹이기
+		// 방문체크 초기화
+		cheeseCnt -= realMeltCheese.size();
+		loop(i, home, realMeltCheese.size()) graph[realMeltCheese[i].lhs][realMeltCheese[i].rhs] = home;
+		loop(i, home, n) loop(j, home, m) vis[i][j] = false;
 	}
 
-	return 0;
+	return home;
 }
