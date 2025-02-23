@@ -1,181 +1,142 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 공주님을 구해라!
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m, t;
-	cin >> n >> m >> t;
+	// T시간 안에 0,0 -> n-1,m-1로 이동
+	// 1.그람검을 구하지 않는 경우 0,0 -> n-1,m-1 BFS
+	// 2.그람검을 구하는 경우 0,0 -> 그람검 BFS + 그람검 -> n-1,m-1까지 거리
+	// 1, 2중 최솟값, 불가능한 경우 Fail
 
-	// 그람 검을 구하지 않고 바로 가는 경우
-	// 그람 검을 구하고 가는 경우
-
-	vector<vector<int> > graph(n, vector<int>(m));
-	vector<vector<int> > dis(n, vector<int>(m));
-	queue<pair<int, int> > checkPos;
-	checkPos.push({ 0, 0 });
-	dis[0][0] = 1;
-	vector<pair<int, int> > checkDir;
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	pair<int, int> swordPos;
-	bool isSword = false;
-	for (int i = 0; i < n; i++)
+	int n, m, t; cin >> n >> m >> t;
+	mat(int, graph, n, m);
+	mat(int, dis, n, m);
+	queue<pii> cp; dir;
+	pii swordPos = { -1, -1 }; // 그람검 위치
+	loop(i, home, n) loop(j, home, m)
 	{
-		for (int j = 0; j < m; j++)
+		cin >> graph[i][j];
+		if (graph[i][j] == 2) swordPos = { i, j };
+	}
+
+	cp.push({ home, home });
+	dis[home][home] = 1;
+
+	int ans = 2147000000; // 공주님을 구하는 최단시간
+
+	// 1.그람검을 구하지 않는 경우 0,0 -> n-1,m-1 BFS
+	while (!cp.empty())
+	{
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop();
+
+		loop(i, home, 4)
 		{
-			cin >> graph[i][j];
-			if (graph[i][j] == 2)
-			{
-				swordPos = { i, j };
-				isSword = true;
-			}
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
+
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (dis[ci][cj] > home) continue;
+			if (graph[ci][cj] == 1) continue;
+
+			cp.push({ ci, cj });
+			dis[ci][cj] = dis[si][sj] + 1;
 		}
 	}
 
-	// 그람 검을 구하지 않고 바로 가는 경우 => 벽 영향
-	while (!checkPos.empty())
-	{
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
-
-		for (int i = 0; i < 4; i++)
-		{
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
-
-			if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
-			if (dis[checkI][checkJ] > 0) continue;
-			if (graph[checkI][checkJ] == 1) continue;
-
-			checkPos.push({ checkI, checkJ });
-			dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-		}
-	}
-
-	int minDis = dis[n - 1][m - 1] - 1;
+	// T시간 안에 구할 수 있으면 최솟값 업데이트 => 거리가 업데이트 되어 있어야함
+	if (dis[n - 1][m - 1] > home && dis[n - 1][m - 1] - 1 <= t) ans = min(ans, dis[n - 1][m - 1] - 1);
 
 	// 거리 초기화
-	for (int i = 0; i < n; i++)
+	loop(i, home, n) loop(j, home, m) dis[i][j] = home;
+
+	// 2.그람검을 구하는 경우 0,0 -> 그람검 BFS + 그람검 -> n-1,m-1까지 거리
+	cp.push({ home, home });
+	dis[home][home] = 1;
+
+	bool isSword = false; // 그람검을 구했는지 체크
+	while (!cp.empty())
 	{
-		for (int j = 0; j < m; j++)
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop();
+
+		// 그람검을 구한 경우 종료
+		if (si == swordPos.lhs && sj == swordPos.rhs) { isSword = true; break; }
+
+		loop(i, home, 4)
 		{
-			dis[i][j] = 0;
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
+
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (dis[ci][cj] > home) continue;
+			if (graph[ci][cj] == 1) continue;
+
+			cp.push({ ci, cj });
+			dis[ci][cj] = dis[si][sj] + 1;
 		}
 	}
 
-	// 그람 검이 없는 경우
-	if (!isSword)
+	// 그람검을 구한 경우 거리를 구해서 T시간 안에 구할 수 있으면 최솟값 업데이트
+	if (isSword)
 	{
-		if (minDis == -1 || minDis > t) cout << "Fail" << '\n';
-		else cout << minDis << '\n';
-
-		return 0;
+		dis[swordPos.lhs][swordPos.rhs] += abs(swordPos.lhs - n + 1) + abs(swordPos.rhs - m + 1);
+		if (dis[swordPos.lhs][swordPos.rhs] - 1 <= t) ans = min(ans, dis[swordPos.lhs][swordPos.rhs] - 1);
 	}
 
-	// 그람 검을 구하고 가는 경우
-	checkPos.push({ 0, 0 });
-	dis[0][0] = 1;
-	int swordDis = -1;
+	// ans가 업데이트 되지 않았으면 구할 수 없음
+	if (ans == 2147000000) { elp("Fail"); return home; }
 
-	// 시작점 => 그람검 => 벽 영향
-	while (!checkPos.empty())
-	{
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
+	// T시간 안에 구할 수 있으면 ans 출력
+	elp(ans);
 
-		if (standardPos.first == swordPos.first && standardPos.second == swordPos.second)
-		{
-			swordDis = dis[standardPos.first][standardPos.second] - 1;
-
-			break;
-		}
-
-		for (int i = 0; i < 4; i++)
-		{
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
-
-			if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
-			if (dis[checkI][checkJ] > 0) continue;
-			if (graph[checkI][checkJ] == 1) continue;
-
-			checkPos.push({ checkI, checkJ });
-			dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-		}
-	}
-
-	// 큐 초기화
-	while (!checkPos.empty()) checkPos.pop();
-
-	// 거리 초기화
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
-		{
-			dis[i][j] = 0;
-		}
-	}
-
-	// 그람검 => 도착점 => 벽 영향 X 
-	checkPos.push(swordPos);
-	dis[swordPos.first][swordPos.second] = 1;
-
-	while (!checkPos.empty())
-	{
-		// 그람 검을 구한 상태가 아니면 break
-		if (swordDis == -1) break;
-
-		pair<int, int> standardPos = checkPos.front();
-		checkPos.pop();
-
-		if (standardPos.first == n - 1 && standardPos.second == m - 1)
-		{
-			swordDis += dis[standardPos.first][standardPos.second] - 1;
-
-			break;
-		}
-
-		for (int i = 0; i < 4; i++)
-		{
-			int checkI = standardPos.first + checkDir[i].first;
-			int checkJ = standardPos.second + checkDir[i].second;
-
-			if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
-			if (dis[checkI][checkJ] > 0) continue;
-
-			checkPos.push({ checkI, checkJ });
-			dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-		}
-	}
-
-	// 그람 검을 가지고 구하러 가지 않은 경우 도착 할 수 없으면 swordDis만 고려
-	if (minDis == -1)
-	{
-		if (swordDis == -1 || swordDis > t) cout << "Fail" << '\n';
-		else cout << swordDis << '\n';
-
-		return 0;
-	}
-
-	// 둘다 도착 가능하면 minDis, swordDis 둘다 고려
-	minDis = min(minDis, swordDis);
-	if (minDis == -1 || minDis > t) cout << "Fail" << '\n';
-	else cout << minDis << '\n';
-
-	return 0;
+	return home;
 }
