@@ -44,6 +44,8 @@ using namespace std;
 const int MAX = 2147000000;
 const int MIN = -2147000000;
 
+#include <unordered_map>
+
 // 가로등
 int main()
 {
@@ -54,11 +56,11 @@ int main()
 	// 방향은 좌우
 	// 어두운 정도를 작은값부터 k개 출력
 
-	int l, n, k; cin >> l >> n >> k;
-	vector<int> dis(l + 1);
-	queue<int> cp;
-	vector<int> d = { -1, 1 };
-	int sPos;
+	ll l, n, k; cin >> l >> n >> k;
+	unordered_map<ll, ll> dis;
+	queue<ll> cp;
+	vector<ll> d = { -1, 1 };
+	ll sPos;
 	loop(i, home, n)
 	{
 		cin >> sPos;
@@ -68,23 +70,28 @@ int main()
 
 	while (!cp.empty())
 	{
-		int s = cp.front();
+		ll s = cp.front();
 		cp.pop();
+
+		// BFS => 최단거리가 보장되므로 k개 출력 후 종료
+		if (k > home)
+		{
+			elp(dis[s] - 1);
+			k--;
+		}
+		else break;
 
 		loop(i, home, d.size())
 		{
-			int c = s + d[i];
+			ll c = s + d[i];
 
 			if (c < home || c >= l + 1) continue;
-			if (dis[c] > home) continue;
+			if (dis.count(c) > home) continue;
 
 			cp.push(c);
 			dis[c] = dis[s] + 1;
 		}
 	}
-	sort(all(dis));
-
-	loop(i, home, k) elp(dis[i] - 1);
 
 	return home;
 }
