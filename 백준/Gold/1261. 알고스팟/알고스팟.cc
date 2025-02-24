@@ -3,27 +3,37 @@ using namespace std;
 
 #define home 0
 
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
 #define ll long long
 #define ld long double
 
 #define pii pair<int, int>
+#define piii pair<int, pii>
 #define pll pair<ll, ll>
+#define plll pair<ll, pll>
 
 #define loop(v, s, e) for(int v = (s); v < (e); v++)
 #define rloop(v, s, e) for(int v = (s); v > (e); v--)
 #define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
 #define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
-#define aloop(t, v, s, c, e, i) for(t v = (s); v c (e); i)
 
 #define p(a) cout << (a)
 #define elp(a) cout << (a) << '\n'
 #define scp(a) cout << (a) << ' '
 
+#define tvec(t, v) vector<t> v
 #define vec(t, v, r) vector<t> v((r))
-#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
 #define gmat(t, v, r) vector<vector<t> > v((r))
-#define dir vector<pii> cd = { {-1, 0}, {1, 0}, { 0, -1 }, { 0, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
 
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
 #define lhs first
 #define rhs second
 
@@ -34,43 +44,43 @@ using namespace std;
 const int MAX = 2147000000;
 const int MIN = -2147000000;
 
-// 알고스팟
+// 알고스팟 
 int main()
 {
-	ios_base::sync_with_stdio(home);
-	cin.tie(home);
-	#ifndef ONLINE_JUDGE
-	ifstream cin("input.txt");
-	#endif
+	init;
 
-	int n, m;
-	cin >> m >> n;
-	mat(int, graph, n, m);
+	// 벽 X => 비용 0 앞에 추가
+	// 벽 O => 비용 1 뒤에 추가
+	int n, m; cin >> m >> n;
+	mat(char, graph, n, m);
 	mat(int, dis, n, m);
-	deque<pii> cp;
-	dir;
-	string is;
-	loop(i, home, n)
-	{
-		cin >> is;
-		loop(j, home, m) graph[i][j] = is[j] - '0';
-	}
-	cp.push_back({ home, home });
+	deque<pii> cp; dir;
+	loop(i, home, n) loop(j, home, m) cin >> graph[i][j];
+
+	cp.push_front({ home, home });
 	dis[home][home] = 1;
+
 	while (!cp.empty())
 	{
-		pii s = cp.front(); cp.pop_front();
-		if (s.lhs == n - 1 && s.rhs == m - 1) { elp(dis[s.lhs][s.rhs] - 1); return home; }
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop_front();
+
 		loop(i, home, 4)
 		{
-			int ci = s.lhs + cd[i].lhs;
-			int cj = s.rhs + cd[i].rhs;
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
+
 			if (ci < home || cj < home || ci >= n || cj >= m) continue;
 			if (dis[ci][cj] > home) continue;
-			dis[ci][cj] = cond(!graph[ci][cj], dis[s.lhs][s.rhs], dis[s.lhs][s.rhs] + 1);
-			cond(!graph[ci][cj], cp.push_front({ ci, cj }), cp.push_back({ ci, cj }));
+			
+			// 벽 X => 비용 0 앞에 추가
+			// 벽 O => 비용 1 뒤에 추가
+			cond(graph[ci][cj] == '0', cp.push_front({ ci, cj }), cp.push_back({ ci, cj }));
+			dis[ci][cj] = cond(graph[ci][cj] == '0', dis[si][sj], dis[si][sj] + 1);
 		}
 	}
+	elp(dis[n - 1][m - 1] - 1);
 
 	return home;
 }
