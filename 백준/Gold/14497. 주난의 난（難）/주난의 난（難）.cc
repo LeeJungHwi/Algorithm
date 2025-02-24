@@ -2,75 +2,88 @@
 using namespace std;
 
 #define home 0
-#define pii pair<int, int>
-#define loop(v, s, e) for(int v = s; v < e; v++)
-#define elprint(a) cout << a << '\n'
-#define cond(c, t, f) ((c) ? (t) : (f))
-#define mat(t, v, r, c) vector<vector<t> > v(r, vector<t>(c))
-#define X first
-#define Y second
 
-// 주난의 난
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+// 주난의 난(難)
 int main()
 {
-	ios_base::sync_with_stdio(home);
-	cin.tie(home);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m;
-	cin >> n >> m;
+	// 친구 X => 비용 0, 앞에 추가
+	// 친구 O => 비용 1, 뒤에 추가
+	int n, m; cin >> n >> m;
 	pii sPos, ePos;
-	cin >> sPos.X >> sPos.Y >> ePos.X >> ePos.Y;
-	mat(int, graph, n, m);
+	cin >> sPos.lhs >> sPos.rhs >> ePos.lhs >> ePos.rhs;
+	sPos.lhs--; sPos.rhs--; ePos.lhs--; ePos.rhs--;
+	mat(char, graph, n, m);
 	mat(int, dis, n, m);
-	deque<pii> checkPos;
-	vector<pii> checkDir;
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
+	deque<pii> cp; dir;
+	loop(i, home, n) loop(j, home, m) cin >> graph[i][j];
 	
-	string inputString;
-	loop(i, 0, n)
+	cp.push_front(sPos);
+	dis[sPos.lhs][sPos.rhs] = 1;
+
+	while (!cp.empty())
 	{
-		cin >> inputString;
-		loop(j, 0, m) if (inputString[j] != '0') graph[i][j] = 1;
-	}
+		int si = cp.front().lhs;
+		int sj = cp.front().rhs;
+		cp.pop_front();
 
-	sPos.X -= 1;
-	sPos.Y -= 1;
-	ePos.X -= 1;
-	ePos.Y -= 1;
-	checkPos.push_front(sPos);
-	dis[sPos.X][sPos.Y] = 1;
-
-	while (!checkPos.empty())
-	{
-		pii standardPos = checkPos.front();
-		checkPos.pop_front();
-
-		if (standardPos == ePos)
+		loop(i, home, 4)
 		{
-			elprint(dis[standardPos.X][standardPos.Y] - 1);
-			return home;
-		}
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
 
-		loop(i, 0, 4)
-		{
-			int checkI = standardPos.X + checkDir[i].X;
-			int checkJ = standardPos.Y + checkDir[i].Y;
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (dis[ci][cj] > home) continue;
 
-			if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
-			if (dis[checkI][checkJ] > 0) continue;
-
-			// 0-1 BFS
-			// 현재 점프 => 비용 0
-			// 다음 점프 => 비용 1
-			dis[checkI][checkJ] = cond(!graph[checkI][checkJ], dis[standardPos.X][standardPos.Y], dis[standardPos.X][standardPos.Y] + 1);
-			cond(!graph[checkI][checkJ], checkPos.push_front({ checkI, checkJ }), checkPos.push_back({ checkI, checkJ }));
+			// 친구 X => 비용 0, 앞에 추가
+			// 친구 O => 비용 1, 뒤에 추가
+			cond(graph[ci][cj] == '0', cp.push_front({ ci, cj }), cp.push_back({ ci, cj }));
+			dis[ci][cj] = cond(graph[ci][cj] == '0', dis[si][sj], dis[si][sj] + 1);
 		}
 	}
+	elp(dis[ePos.lhs][ePos.rhs] - 1);
 
 	return home;
 }
