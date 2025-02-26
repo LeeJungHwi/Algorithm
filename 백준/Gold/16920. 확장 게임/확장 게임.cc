@@ -1,160 +1,138 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-// 확장게임
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+// 확장 게임
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m, p; // N, M, P 3, 3, 2
-	cin >> n >> m >> p;
+	// 플레이어 i가 가지는 성부터 멀티 소스 BFS 돌려서 Si칸 만큼 확장
+	// 남은 빈공간이 없거나 더 이상 확장이 일어나지 않으면 각 플레이어가 가지는 성의 개수 출력
 
-	// 0.각 플레이어가 한턴에 이동하는 칸 저장
-	vector<int> moveCnts(p + 1);
-	int moveCnt;
-	for (int i = 1; i < p + 1; i++)
+	int n, m, k; cin >> n >> m >> k;
+	vec(int, s, k); // 각 플레이어가 확장 가능한 칸수
+	loop(i, home, k) cin >> s[i];
+	mat(char, graph, n, m);
+	mat(int, dis, n, m);
+	queue<pii> cp; dir;
+	map<int, vector<pii>> castlePos; // 각 플레이어가 가지는 성 위치
+	map<int, int> castleCnt; // 각 플레이어의 성 개수
+	int emptyCnt = home; // 남은 빈공간 개수
+	loop(i, home, n) loop(j, home, m)
 	{
-		cin >> moveCnt;
-		moveCnts[i] = moveCnt;
-	}
+		cin >> graph[i][j];
 
-	// 1.그래프 돌면서 플레이어 위치 맵핑하고 맵 돌면서 각 플레이어를 순서대로 큐에 저장
-	// 2.BFS 돌리면서 각 플레이어가 한턴에 이동하는 횟수만큼 확장
-	// 3.그래프 돌면서 각 플레이어의 성 갯수 카운팅
-
-	vector<vector<int> > graph(n, vector<int>(m));
-	vector<vector<bool> > vis(n, vector<bool>(m));
-	vector<vector<int> > dis(n, vector<int>(m));
-	queue<pair<pair<int, int>, int> > checkPos; // 체크 할 위치, 각 플레이어 번호
-	vector<pair<int, int> > checkDir;
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	// .은 0 #은 -1 각 플레리어는 숫자로 치환
-	// 벽은 방문체크해서 이동못하게함
-	map<int, vector<pair<int, int> > > playerPos; // 각 플레이어가 가지는 성 위치 맵핑
-	string inputString;
-	for (int i = 0; i < n; i++)
-	{
-		cin >> inputString;
-		for (int j = 0; j < m; j++)
+		// 각 플레이어가 가지는 성 위치 저장 및 개수 카운팅
+		if (isdigit(graph[i][j]))
 		{
-			graph[i][j] = inputString[j] -'0';
-
-			if (inputString[j] == '.') graph[i][j] = 0;
-			else if (inputString[j] == '#')
-			{
-				graph[i][j] = -1;
-				vis[i][j] = true;
-			}
-			else
-			{
-				graph[i][j] = inputString[j] - '0';
-				playerPos[graph[i][j]].push_back({ i,j });
-			}
+			castlePos[graph[i][j] - '0'].push_back({ i, j });
+			castleCnt[graph[i][j] - '0']++;
 		}
+		// 남은 빈공간 개수 카운팅
+		else if(graph[i][j] == '.') emptyCnt++;
 	}
 
-	// 0. 더 이상 확장이 일어나지 않았을 때 종료
-	// 1. 각 플레이어를 순서대로 확장 시작
 	while (true)
 	{
-		int expandCnt = 0;
-
-		for (auto it = playerPos.begin(); it != playerPos.end(); it++)
+		// 플레이어 i가 가지는 성부터 멀티 소스 BFS 돌려서 Si칸 만큼 확장
+		bool isExpand = false; // 플레이어가 한명이라도 확장했는지 체크
+		mloop(it, castlePos)
 		{
-			// 다음 확장 위치
-			vector<pair<int, int> > nextPos;
-
-			// 현재 플레이어 위치 모두 큐에 저장
-			for (int i = 0; i < it->second.size(); i++)
+			// 현재 플레이어가 가지는 성 위치들 큐에 넣기
+			loop(i, home, it->rhs.size())
 			{
-				checkPos.push({ it->second[i], it->first });
-				vis[it->second[i].first][it->second[i].second] = true;
-				dis[it->second[i].first][it->second[i].second] = 1;
+				cp.push(it->rhs[i]);
+				dis[it->rhs[i].lhs][it->rhs[i].rhs] = 1;
 			}
 
-			while (!checkPos.empty())
+			// 멀티 소스 BFS 돌려서 Si칸 만큼 확장
+			tvec(pii, expandCastlePos); // 현재 플레이어가 이번턴에 확장한 성 위치
+			while (!cp.empty())
 			{
-				pair<pair<int, int>, int> standardPos = checkPos.front();
-				checkPos.pop();
+				int si = cp.front().lhs;
+				int sj = cp.front().rhs;
+				cp.pop();
 
-				// 각 플레이어 확장 횟수 체크 하면서 다음 확장 위치 저장
-				if (dis[standardPos.first.first][standardPos.first.second] > moveCnts[standardPos.second])
+				// Si칸 만큼 확장
+				if (dis[si][sj] > s[it->lhs - 1]) continue;
+
+				loop(i, home, 4)
 				{
-					nextPos.push_back(standardPos.first);
-					continue;
-				}
+					int ci = si + cd[i].lhs;
+					int cj = sj + cd[i].rhs;
 
-				for (int i = 0; i < 4; i++)
-				{
-					int checkI = standardPos.first.first + checkDir[i].first;
-					int checkJ = standardPos.first.second + checkDir[i].second;
+					if (ci < home || cj < home || ci >= n || cj >= m) continue;
+					if (dis[ci][cj] > home) continue;
+					if (graph[ci][cj] != '.') continue; // 빈공간이 아니면 X
 
-					if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
+					cp.push({ ci, cj });
+					dis[ci][cj] = dis[si][sj] + 1;
 
-					// 내가 확장한 곳 중 최단거리만 체크
-					if (graph[checkI][checkJ] == standardPos.second && dis[checkI][checkJ] != 0 && dis[checkI][checkJ] < dis[standardPos.first.first][standardPos.first.second] + 1) continue;
-
-					// 큐에 중복 저장 방지 => 메모리 초과
-					if (vis[checkI][checkJ]) continue;
-
-					// 다른 플레이어가 확장한 곳 체크
-					if (graph[checkI][checkJ] != 0 && graph[checkI][checkJ] != standardPos.second) continue;
-
-					// 확장
-					checkPos.push({ {checkI, checkJ}, standardPos.second });
-					dis[checkI][checkJ] = dis[standardPos.first.first][standardPos.first.second] + 1;
-					vis[checkI][checkJ] = true;
-					graph[checkI][checkJ] = standardPos.second;
-					expandCnt++;
+					graph[ci][cj] = it->lhs + '0'; // 현재 플레이어 성으로 마킹
+					expandCastlePos.push_back({ ci, cj }); // 확장한 성 위치 추가
+					emptyCnt--; // 남은 빈공간 감소
+					castleCnt[it->lhs]++; // 현재 플레이어 성 개수 카운팅
+					isExpand = true; // 확장이 일어남
 				}
 			}
 
-			// 다음 확장 위치 갱신
-			it->second = nextPos;
+			// 확장한 성 위치부터 다음 BFS
+			castlePos[it->lhs] = expandCastlePos;
 		}
 
-		// 더 이상 확장이 일어나지 않으면 종료
-		if (expandCnt == 0) break;
-	}
-
-	//for (auto a : graph)
-	//{
-	//	for (auto b : a)
-	//	{
-	//		cout << b << ' ';
-	//	}
-	//	cout << '\n';
-	//}
-
-	// 3.그래프 돌면서 각 플레이어의 성의 수 구하기
-
-	map<int, int> castleCnts;
-
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
+		// 남은 빈공간이 없거나 더 이상 확장이 일어나지 않으면 각 플레이어가 가지는 성의 개수 출력
+		if (emptyCnt == home || !isExpand)
 		{
-			if (graph[i][j] > 0)
-			{
-				castleCnts[graph[i][j]]++;
-			}
+			mloop(it, castleCnt) scp(it->rhs);
+			return home;
 		}
 	}
 
-	for (auto it = castleCnts.begin(); it != castleCnts.end(); it++) cout << it->second << ' ';
-
-	return 0;
+	return home;
 }
