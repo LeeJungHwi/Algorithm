@@ -60,27 +60,26 @@ int main()
 	cin >> sPos.lhs >> sPos.rhs >> ePos.lhs >> ePos.rhs;
 	sPos.lhs--; sPos.rhs--; ePos.lhs--; ePos.rhs--;
 	mat(int, graph, n, m);
-	smat(bool, vis, n, m, 2); // vis[i][j][k] => i,j로 k번 개구리밥을 무시하고 방문
+	smat(int, dis, n, m, 2); // vis[i][j][k] => i,j로 k번 개구리밥을 무시한 최단거리
 	vec(bool, visI, n); // visI[i] => i번째 행에서 개구리밥을 무시함
 	vec(bool, visJ, m); // visI[i] => i번째 열에서 개구리밥을 무시함
 	loop(i, home, n) loop(j, home, m) cin >> graph[i][j];
-	queue<pair<pii, pii>> cp; dir; // (개구리밥 무시 횟수, 점프 횟수, 위치)
+	queue<piii> cp; dir; // (개구리밥 무시 횟수, 위치)
 
-	cp.push({ {home, home}, sPos });
-	vis[sPos.lhs][sPos.rhs][home] = true;
+	cp.push({ home, sPos });
+	dis[sPos.lhs][sPos.rhs][home] = 1;
 
 	while (!cp.empty())
 	{
 		int si = cp.front().rhs.lhs;
 		int sj = cp.front().rhs.rhs;
-		int sc = cp.front().lhs.lhs;
-		int sp = cp.front().lhs.rhs;
+		int sc = cp.front().lhs;
 		cp.pop();
 
 		// 도착
 		if (si == ePos.lhs && sj == ePos.rhs)
 		{
-			elp(sp);
+			elp(dis[si][sj][sc] - 1);
 			return home;
 		}
 
@@ -101,10 +100,10 @@ int main()
 						cj += cd[i].rhs;
 
 						if (ci < home || cj < home || ci >= n || cj >= m) break;
-						if (vis[ci][cj][sc + 1]) continue;
+						if (dis[ci][cj][sc + 1] > home) continue;
 
-						cp.push({ {sc + 1, sp + 1}, {ci, cj} });
-						vis[ci][cj][sc + 1] = true;
+						cp.push({ sc + 1, {ci, cj} });
+						dis[ci][cj][sc + 1] = dis[si][sj][sc] + 1;
 					}
 				}
 
@@ -125,10 +124,10 @@ int main()
 						cj += cd[i].rhs;
 
 						if (ci < home || cj < home || ci >= n || cj >= m) break;
-						if (vis[ci][cj][sc + 1]) continue;
+						if (dis[ci][cj][sc + 1] > home) continue;
 
-						cp.push({ {sc + 1, sp + 1}, {ci, cj} });
-						vis[ci][cj][sc + 1] = true;
+						cp.push({ sc + 1, {ci, cj} });
+						dis[ci][cj][sc + 1] = dis[si][sj][sc] + 1;
 					}
 				}
 
@@ -143,10 +142,10 @@ int main()
 			int cj = sj + cd[i].rhs * graph[si][sj];
 
 			if (ci < home || cj < home || ci >= n || cj >= m) continue;
-			if (vis[ci][cj][sc]) continue;
+			if (dis[ci][cj][sc] > home) continue;
 
-			cp.push({ {sc, sp + 1}, {ci, cj} });
-			vis[ci][cj][sc] = true;
+			cp.push({ sc, {ci, cj} });
+			dis[ci][cj][sc] = dis[si][sj][sc] + 1;
 		}
 	}
 	elp(-1);
