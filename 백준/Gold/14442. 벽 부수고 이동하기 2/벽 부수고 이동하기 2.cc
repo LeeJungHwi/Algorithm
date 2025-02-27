@@ -1,127 +1,112 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <tuple>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 벽 부수고 이동하기 2
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m, k; // N, M, K 6, 4, 2
-	cin >> n >> m >> k;
+	// 0,0 -> n - 1,m - 1로 가는 최단거리
+	// 벽을 k번 까지 부술 수 있음
+	// BFS 내부에서 벽을 부수는 경우와 벽을 부수지 않는 경우로 뻗어나감
+	
+	int n, m, k; cin >> n >> m >> k;
+	mat(char, graph, n, m);
+	smat(int, dis, n, m, k + 1); // dis[i][j][k] => i,j 까지 k번 벽을 부셔서 오는 최단거리
+	queue<piii> cp; dir; // (벽 부순 횟수, 위치)
+	loop(i, home, n) loop(j, home, m) cin >> graph[i][j];
 
-	tuple<int, int, int> startPos = make_tuple(1, 1, 0); // 시작 위치 1, 1, 0(벽 안 부순 상태)
-	pair<int, int> endPos = { n , m }; // 탈출 위치 n, m
+	cp.push({ home, {home, home} });
+	dis[home][home][home] = 1;
 
-	vector<vector<char> > graph(n + 1, vector<char>(m + 1)); // 그래프
-	vector<vector<vector<int> > > dis(n + 1, vector<vector<int> >(m + 1, vector<int>(k + 1))); // 거리
-	queue<tuple<int, int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	//	0100
-	//	1110
-	//	1000
-	//	0000
-	//	0111
-	//	0000
-
-	string inputString; // 입력문자열
-
-	for (int i = 1; i < n + 1; i++)
+	while (!cp.empty())
 	{
-		cin >> inputString;
+		int si = cp.front().rhs.lhs;
+		int sj = cp.front().rhs.rhs;
+		int sc = cp.front().lhs;
+		cp.pop();
 
-		for (int j = 1; j < m + 1; j++)
+		// 도착
+		if (si == n - 1 && sj == m - 1)
 		{
-			graph[i][j] = inputString[j - 1];
-		}
-	}
-
-	// 시작 위치부터 BFS 돌리기
-	// 경계체크, 방문체크(거리로)
-	// 벽체크 : 벽을 k번 부순게 아니면 부순상태로 변환하고 큐에 저장, 거리증가 벽을 이미 k번 부셨으면 continue
-	// 빈칸체크 : 큐에 저장, 거리증가
-	// BFS가 종료될때까지 도착못하면 -1 출력 BFS 내에서 타출위치에 도착하면 거리 출력
-
-	checkPos.push(startPos);
-	dis[get<0>(startPos)][get<1>(startPos)][get<2>(startPos)] = 1;
-
-	while (!checkPos.empty()) // 큐가 빌때까지
-	{
-		// 기준위치 꺼냄
-		tuple<int, int, int> standardPos = checkPos.front();
-		checkPos.pop();
-
-		// BFS 내에서 타출위치에 도착하면 거리 출력
-		if (get<0>(standardPos) == endPos.first && get<1>(standardPos) == endPos.second)
-		{
-			cout << dis[endPos.first][endPos.second][get<2>(standardPos)] << '\n';
-
-			return 0;
+			elp(dis[si][sj][sc]);
+			return home;
 		}
 
-		// 상하좌우
-		for (int i = 0; i < 4; i++)
+		loop(i, home, 4)
 		{
-			// 체크 할 위치
-			int checkI = get<0>(standardPos) + checkDir[i].first;
-			int checkJ = get<1>(standardPos) + checkDir[i].second;
-			int checkS = get<2>(standardPos);
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
 
-			// 경계체크
-			if (checkI < 1 || checkJ < 1 || checkI >= n + 1 || checkJ >= m + 1)
-			{
-				continue;
-			}
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (dis[ci][cj][sc] > home) continue;
 
-			// 방문체크(거리로)
-			if (dis[checkI][checkJ][checkS] > 0)
+			// 벽을 부수는 경우
+			if (graph[ci][cj] == '1')
 			{
-				continue;
-			}
-
-			// 벽체크
-			// 벽을 k번 부순게 아니면서 처음방문이면 부순상태로 변환하고 큐에 저장, 거리증가
-			// 벽을 이미 k번 부셨으면 continue
-			if (graph[checkI][checkJ] == '1')
-			{
-				if (checkS < k)
+				if (sc < k)
 				{
-					if (dis[checkI][checkJ][checkS + 1] == 0)
-					{
-						checkPos.push({ checkI, checkJ, checkS + 1 });
-						dis[checkI][checkJ][checkS + 1] = dis[get<0>(standardPos)][get<1>(standardPos)][checkS] + 1;
-					}
+					if (dis[ci][cj][sc + 1] > home) continue;
+
+					cp.push({ sc + 1, {ci, cj} });
+					dis[ci][cj][sc + 1] = dis[si][sj][sc] + 1;
 				}
 
 				continue;
 			}
 
-			// 빈칸체크
-			// 처음방문이면 큐에저장, 거리증가
-			if (dis[checkI][checkJ][checkS] == 0)
-			{
-				checkPos.push({ checkI, checkJ, checkS });
-				dis[checkI][checkJ][checkS] = dis[get<0>(standardPos)][get<1>(standardPos)][checkS] + 1;
-			}
+			// 벽을 부수지 않는 경우
+			cp.push({ sc, {ci, cj} });
+			dis[ci][cj][sc] = dis[si][sj][sc] + 1;
 		}
 	}
+	elp(-1);
 
-	// BFS가 종료될때까지 도착못하면 -1 출력
-	cout << -1 << '\n';
-
-	return 0;
+	return home;
 }
