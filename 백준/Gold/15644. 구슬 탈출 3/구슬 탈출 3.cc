@@ -1,173 +1,180 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <tuple>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-// 구슬 탈출3
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+// 구슬 탈출 3
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n, m; // N, M 5, 5
-	cin >> n >> m;
+	// 빨간구슬만 떨어뜨리기 위한 최단거리 및 기울인 과정 => 기울이는 횟수를 10회 넘기면 X
+	// 구멍을 만나면 떨어짐 => 파란구슬이 떨어지면 X
+	// 두 구슬이 겹칠 수 없음 => 기울였을 때 더 많이 이동한 구슬을 한칸 뒤로 빼야함
+	// 벽이면 이동할 수 없음 => 제자리
 
-	// 구멍 하나가 뚤린 직사각형 보드에 빨간 구슬과 파란 구슬을 하나씩 넣고 빨간 구슬을 구멍을 통해 빼내는 게임
-	// 상하좌우로 기울이면 벽을 만날때까지 빨간 구슬과 파란 구슬이 같이 움직임
-	// 빨간 구슬만 구멍으로 빠져야 성공(동시에 빠지거나 나중에라도 파란 구슬이 빠지면 실패)
-	// 빨간 구슬과 파란 구슬이 동시에 같은 칸에 있을 수 없으므로 앞에 구슬이 있으면 멈춰야함
-	// 10번 이하로 기울여서 빨간 구슬을 구멍으로 빼낼수있으면 기울인 횟수 출력, 이동과정 출력
-	// 없으면 -1 출력
-
-	vector<vector<char>> graph(n, vector<char>(m)); // 그래프
-	vector<vector<vector<vector<bool>>>> vis(graph.size(), vector<vector<vector<bool>>>(graph[0].size(), vector<vector<bool>>(graph.size(), vector<bool>(graph[0].size())))); // 방문체크
-	queue<tuple<pair<int, int>, pair<int, int>, string > > checkPos; // 체크 할 위치 (빨간구슬위치쌍, 파란구슬위치쌍, 현재까지 기울인 과정) 저장
-	vector<pair<int, int>> checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-	pair<int, int> redPos;   // 빨간구슬위치
-	pair<int, int> bluePos;  // 파란구슬위치
-	string dirName = "UDLR"; // 기울인 과정 추적할 이름
-
-	//#####
-	//#..B#
-	//#.#.#
-	//#RO.#
-	//#####
-	// 체크 할 위치 저장
-
-	string inputString; // 입력문자열
-
-	for (int i = 0; i < n; i++)
+	int n, m; cin >> n >> m;
+	mat(char, graph, n, m);
+	ssmat(int, dis, n, m, n, m); // dis[i][j][k][l] => 빨간구슬 i,j 파란구슬 k,l일 때 최단거리
+	queue<pair<pair<pii, pii>, string>> cp; dir; // (빨간구슬 위치, 파란구슬 위치, 기울인 과정)
+	map<int, char> pathMap = { {home, 'U'}, {1, 'D'}, {2, 'L'}, {3, 'R'} }; // (숫자방향, 문자방향)
+	pii redPos, bluePos;
+	loop(i, home, n) loop(j, home, m)
 	{
-		cin >> inputString;
+		cin >> graph[i][j];
 
-		for (int j = 0; j < m; j++)
-		{
-			graph[i][j] = inputString[j];
-
-			if (graph[i][j] == 'R') redPos = { i, j };
-			else if (graph[i][j] == 'B') bluePos = { i, j };
-		}
+		// 두 구슬 위치 저장
+		if (graph[i][j] == 'R') redPos = { i, j };
+		else if (graph[i][j] == 'B') bluePos = { i, j };
 	}
 
-	// 두 구슬 위치부터 BFS 돌리기
-	checkPos.push({ redPos, bluePos, "" });
-	vis[redPos.first][redPos.second][bluePos.first][bluePos.second] = true;
+	cp.push({ {redPos, bluePos}, ""});
+	dis[redPos.lhs][redPos.rhs][bluePos.lhs][bluePos.rhs] = 1;
 
-	int cnt = 1; // 구슬이 움직인 횟수
-
-	while (!checkPos.empty() && cnt <= 10) // 큐가 비거나 구슬이 움직인 횟수가 10보다 크면 종료
+	while (!cp.empty())
 	{
-		// 체크 할 위치 개수
-		int checkCnt = checkPos.size();
+		int rsi = cp.front().lhs.lhs.lhs;
+		int rsj = cp.front().lhs.lhs.rhs;
+		int bsi = cp.front().lhs.rhs.lhs;
+		int bsj = cp.front().lhs.rhs.rhs;
+		string path = cp.front().rhs;
+		cp.pop();
 
-		while (checkCnt != 0) // 체크 할 위치 개수만큼 돌면서
+		// 기울이는 횟수를 10회 넘기면 X
+		if (dis[rsi][rsj][bsi][bsj] > 10)
 		{
-			// 기준위치 꺼냄
-			tuple<pair<int, int>, pair<int, int>, string > standardPos = checkPos.front();
-			checkPos.pop();
+			elp(-1);
+			return home;
+		}
 
-			for (int i = 0; i < 4; i++)
+		loop(i, home, 4)
+		{
+			int rci = rsi;
+			int rcj = rsj;
+			int bci = bsi;
+			int bcj = bsj;
+
+			// 벽을 만날 때 까지 두 구슬 기울이기
+
+			// 빨간 구슬 기울이기
+			int rMoveCnt = home;
+			while (true)
 			{
-				// 체크 할 두 구슬 위치
-				pair<int, int> checkRedPos = get<0>(standardPos);
-				pair<int, int> checkBluePos = get<1>(standardPos);
+				// 한칸 이동
+				rci += cd[i].lhs;
+				rcj += cd[i].rhs;
+				rMoveCnt++;
 
-				// 각 구슬의 움직인 횟수
-				int redCnt = 0;
-				int blueCnt = 0;
-
-				// 빨간 구슬 기울이기
-				while (true)
+				// 벽이면 한칸 뒤로 뺌
+				if (graph[rci][rcj] == '#')
 				{
-					// 벽체크
-					if (graph[checkRedPos.first + checkDir[i].first][checkRedPos.second + checkDir[i].second] == '#') break;
+					rci -= cd[i].lhs;
+					rcj -= cd[i].rhs;
+					rMoveCnt--;
 
-					// 구멍체크
-					if (graph[checkRedPos.first][checkRedPos.second] == 'O') break;
-
-					// 이동 후 이동횟수 증가
-					checkRedPos.first += checkDir[i].first;
-					checkRedPos.second += checkDir[i].second;
-					redCnt++;
+					break;
 				}
 
-				// 파란 구슬 기울이기
-				while (true)
-				{
-					// 벽체크
-					if (graph[checkBluePos.first + checkDir[i].first][checkBluePos.second + checkDir[i].second] == '#') break;
-
-					// 구멍체크
-					if (graph[checkBluePos.first][checkBluePos.second] == 'O') break;
-
-					// 이동 후 이동횟수 증가
-					checkBluePos.first += checkDir[i].first;
-					checkBluePos.second += checkDir[i].second;
-					blueCnt++;
-				}
-
-				// 파란 구슬이 구멍에 빠지는 경우 체크
-				if (graph[checkBluePos.first][checkBluePos.second] == 'O') continue;
-
-				// 빨간 구슬이 구멍에 빠지는 경우 기울인 횟수 출력
-				// 기울인 과정 출력 후 종료
-				if (graph[checkRedPos.first][checkRedPos.second] == 'O')
-				{
-					cout << cnt << '\n';
-					cout << get<2>(standardPos) + dirName[i] << '\n';
-
-					return 0;
-				}
-
-				// 빨간 구슬과 파란 구슬이 같은 위치에 있는 경우
-				if (checkRedPos == checkBluePos)
-				{
-					// 이동한 거리가 더 많은 구슬을 한 칸 뒤로 이동시킴
-					if (redCnt > blueCnt)
-					{
-						checkRedPos.first -= checkDir[i].first;
-						checkRedPos.second -= checkDir[i].second;
-					}
-					else
-					{
-						checkBluePos.first -= checkDir[i].first;
-						checkBluePos.second -= checkDir[i].second;
-					}
-				}
-
-				// 빨간 구슬과 파란 구슬의 위치 방문체크
-				if (vis[checkRedPos.first][checkRedPos.second][checkBluePos.first][checkBluePos.second]) continue;
-
-				// 빨간 구슬과 파란 구슬이 초기상태인지 체크
-				if (checkRedPos == redPos && checkBluePos == bluePos) continue;
-
-				// 큐에 저장 후 방문체크
-				checkPos.push({ checkRedPos, checkBluePos, get<2>(standardPos) + dirName[i] });
-				vis[checkRedPos.first][checkRedPos.second][checkBluePos.first][checkBluePos.second] = true;
+				// 구멍이면 떨어짐
+				if (graph[rci][rcj] == 'O') { rMoveCnt = -1; break; }
 			}
 
-			// 하나의 체크 할 위치 처리한 상태
-			checkCnt--;
+			// 파란 구슬 기울이기
+			int bMoveCnt = home;
+			while (true)
+			{
+				// 한칸 이동
+				bci += cd[i].lhs;
+				bcj += cd[i].rhs;
+				bMoveCnt++;
+
+				// 벽이면 한칸 뒤로 뺌
+				if (graph[bci][bcj] == '#')
+				{
+					bci -= cd[i].lhs;
+					bcj -= cd[i].rhs;
+					bMoveCnt--;
+
+					break;
+				}
+
+				// 구멍이면 떨어짐
+				if (graph[bci][bcj] == 'O') { bMoveCnt = -1; break; }
+			}
+
+			// 파란 구슬이 떨어지면 X
+			if (bMoveCnt == -1) continue;
+
+			// 빨간 구슬이 떨어지면 종료
+			if (rMoveCnt == -1)
+			{
+				elp(dis[rsi][rsj][bsi][bsj]);
+				elp(path + pathMap[i]);
+				return home;
+			}
+
+			// 두 구슬이 겹쳐지면 더 많이 이동한 구슬을 한칸 뒤로 뺌
+			if (rci == bci && rcj == bcj)
+			{
+				if (rMoveCnt > bMoveCnt) { rci -= cd[i].lhs; rcj -= cd[i].rhs; }
+				else { bci -= cd[i].lhs; bcj -= cd[i].rhs; }
+			}
+
+			if (dis[rci][rcj][bci][bcj] > home) continue;
+
+			cp.push({ {{rci, rcj}, {bci, bcj}}, path + pathMap[i]});
+			dis[rci][rcj][bci][bcj] = dis[rsi][rsj][bsi][bsj] + 1;
 		}
-
-		// 한스텝 끝나면 구슬이 움직인 횟수 증가
-		cnt++;
 	}
+	elp(-1);
 
-	// BFS 과정에서 종료되지 않은경우
-	// 10번 이내로 빨간 구슬을 구멍에 빼낼 수 없는 경우이므로 -1 출력
-	cout << -1 << '\n';
-
-	return 0;
+	return home;
 }
