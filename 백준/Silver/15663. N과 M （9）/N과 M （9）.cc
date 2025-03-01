@@ -1,41 +1,78 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-int n, m; // N, M 4, 2
-map<int, int> nums; // 처음 N개의 자연수 저장
-vector<int> sequence; // 수열 저장
+#define home 0
 
-// DFS
-void DFS(int L)
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+int n, m;
+vector<int> order;
+
+void DFS(int L, map<int, int> &cnt)
 {
-	if (L == m) // 종료조건 : M개를 뽑은 경우
+	if (L == m)
 	{
-		// 선택한 수 출력
-		for (int i = 0; i < sequence.size(); i++)
-		{
-			cout << sequence[i] << ' ';
-		}
-
+		loop(i, home, order.size()) scp(order[i]);
 		cout << '\n';
 	}
 	else
 	{
-		// 맵 돌면서 
-		for (auto it = nums.begin(); it != nums.end(); it++)
+		mloop(it, cnt)
 		{
-			if (it->second > 0) // 등장횟수가 남아있다면
+			// 사용 가능한 경우
+			if (it->rhs > home)
 			{
-				it->second--; // 선택
-				sequence.push_back(it->first);
-				DFS(L + 1); // 다음 숫자 재귀호출
-				sequence.pop_back();
-				it->second++; // 미선택
+				it->rhs--;
+				order.push_back(it->lhs);
+				DFS(L + 1, cnt);
+				order.pop_back();
+				it->rhs++;
 			}
 		}
 	}
@@ -44,24 +81,20 @@ void DFS(int L)
 // N과 M (9)
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
+
+	// 서로 같을 수 있는 n개의 수 중 m개를 선택하는 비중복순열
 
 	cin >> n >> m;
-
-	int num; // 숫자
-
-	// 9 7 9 1
-	for (int i = 0; i < n; i++)
+	map<int, int> cnt;
+	int num;
+	loop(i, home, n)
 	{
 		cin >> num;
-		nums[num]++; // (자연수, 등장횟수) 맵핑 -> (1, 1) (7, 1) (9, 2)
+		cnt[num]++;
 	}
 
-	// DFS
-	DFS(0);
+	DFS(home, cnt);
 
-	return 0;
+	return home;
 }
