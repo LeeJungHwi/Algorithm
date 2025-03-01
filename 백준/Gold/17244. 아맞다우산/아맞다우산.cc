@@ -1,201 +1,127 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-int m, n; // M, N 7, 6
-vector<vector<char> > graph(50, vector<char>(50)); // 그래프
-vector<vector<int> > dis(50, vector<int>(50)); // 거리
-queue<pair<int, int> > checkPos; // 체크 할 위치
-vector<pair<int, int> > checkDir = { {-1, 0}, {1, 0}, {0, -1}, {0, 1} }; // 상하좌우
-pair<int, int> startPos, endPos; // 시작위치, 도착위치
+#define home 0
 
-vector<pair<int, int> > objectPos; // 각 물건 위치
-vector<int> order; // 물건 챙기는 순서
-vector<bool> vis(5); // 물건 선택 체크
-int minDis = 2147000000; // 모든 물건을 가지고 탈출하는 최단거리
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
 
-// 1.DFS로 가지러 갈 물건 순서 정하기
-void DFS(int L)
-{
-	if (L == objectPos.size())
-	{
-		// 2.BFS로 순서대로 물건을 가지고 탈출하는 최단거리 갱신
+#define ll long long
+#define ld long double
 
-		// 마지막 도착위치로 탈출위치 추가
-		objectPos.push_back(endPos);
-		order.push_back(order.size());
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
 
-		// 현재 물건 챙기는 순서로 갔을 때 거리 합
-		int sumDis = 0; 
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
 
-		// startPos 부터
-		checkPos.push(startPos);
-		dis[startPos.first][startPos.second] = 1;
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
 
-		// startPos => 물건 0 => 물건 1 => ... => endPos
-		for (int i = 0; i < order.size(); i++)
-		{
-			// 큐가 빌때까지
-			while (!checkPos.empty())
-			{
-				// 기준위치 꺼냄
-				pair<int, int> standardPos = checkPos.front();
-				checkPos.pop();
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
 
-				// 현재 목표 물건이면 거리 누적하고 break
-				if (standardPos.first == objectPos[order[i]].first && standardPos.second == objectPos[order[i]].second)
-				{
-					sumDis += dis[standardPos.first][standardPos.second] - 1;
-					break;
-				}
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
 
-				// 상하좌우
-				for (int j = 0; j < 4; j++)
-				{
-					// 체크 할 위치
-					int checkI = standardPos.first + checkDir[j].first;
-					int checkJ = standardPos.second + checkDir[j].second;
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
 
-					// 경계체크
-					if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
-
-					// 방문체크(거리로)
-					if (dis[checkI][checkJ] > 0) continue;
-
-					// 벽체크
-					if (graph[checkI][checkJ] == '#') continue;
-
-					// 큐에저장, 거리저장
-					checkPos.push({ checkI, checkJ });
-					dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-				}
-			}
-
-			// 큐 초기화
-			while (!checkPos.empty()) checkPos.pop();
-
-			// 거리 초기화
-			for (int j = 0; j < n; j++)
-			{
-				for (int k = 0; k < m; k++)
-				{
-					dis[j][k] = 0;
-				}
-			}
-
-			// 다음 물건 부터 BFS
-			// 마지막 물건 => endPos는 ㄴ
-			if (i != order.size() - 1)
-			{
-				checkPos.push(objectPos[order[i]]);
-				dis[objectPos[order[i]].first][objectPos[order[i]].second] = 1;
-			}
-		}
-
-		// 모든 물건을 가지고 탈출하는 최단거리 갱신
-		minDis = min(minDis, sumDis);
-
-		// 탈출위치 제거
-		order.pop_back();
-		objectPos.pop_back();
-	}
-	else
-	{
-		// 물건 순서
-		for (int i = 0; i < objectPos.size(); i++)
-		{
-			if (!vis[i])
-			{
-				vis[i] = true;
-				order.push_back(i);
-				DFS(L + 1);
-				order.pop_back();
-				vis[i] = false;
-			}
-		}
-	}
-}
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 아맞다우산
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	cin >> m >> n;
-
-	// 그래프 초기화
-	// 시작위치 및 도착위치 저장
-	// 물건 위치 저장
-	string inputString;
-	for (int i = 0; i < n; i++)
+	// 물건 조합 상태 => 1 << 물건 개수
+	
+	int n, m; cin >> m >> n;
+	mat(char, graph, n, m);
+	queue<piii> cp; dir; // (물건 조합 상태, 위치)
+	pii sPos, ePos;
+	tvec(pii, xPos);
+	loop(i, home, n) loop(j, home, m)
 	{
-		cin >> inputString;
-		for (int j = 0; j < m; j++)
-		{
-			graph[i][j] = inputString[j];
-			if (graph[i][j] == 'S') startPos = { i, j };
-			else if (graph[i][j] == 'E') endPos = { i, j };
-			else if (graph[i][j] == 'X') objectPos.push_back({ i, j });
-		}
+		cin >> graph[i][j];
+
+		// 시작 위치, 도착 위치, 물건 위치 저장
+		if (graph[i][j] == 'S') sPos = { i, j };
+		else if (graph[i][j] == 'E') ePos = { i, j };
+		else if (graph[i][j] == 'X') xPos.push_back({ i, j });
 	}
+	ismat(int, dis, n, m, 1 << xPos.size(), MAX); // dis[i][j][k] => i,j에서 물건 조합 상태가 k일 때 최단거리
 
-	// 0.물건 수가 0개면 S => E 최단거리 출력
-	// 1.DFS로 가지러 갈 물건 순서 정하기
-	// 2.BFS로 순서대로 물건을 가지고 탈출하는 최단거리 갱신
+	cp.push({ home, sPos });
+	dis[sPos.lhs][sPos.rhs][home] = 1;
 
-	// 0.물건 수가 0개면 S => E 최단거리 출력
-	if (objectPos.empty())
+	while (!cp.empty())
 	{
-		checkPos.push(startPos);
-		dis[startPos.first][startPos.second] = 1;
+		int si = cp.front().rhs.lhs;
+		int sj = cp.front().rhs.rhs;
+		int sc = cp.front().lhs;
+		cp.pop();
 
-		// 큐가 빌때까지
-		while (!checkPos.empty())
+		loop(i, home, 4)
 		{
-			// 기준위치 꺼냄
-			pair<int, int> standardPos = checkPos.front();
-			checkPos.pop();
+			int ci = si + cd[i].lhs;
+			int cj = sj + cd[i].rhs;
+			int cc = sc;
+			
+			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (graph[ci][cj] == '#') continue;
 
-			// 상하좌우
-			for (int i = 0; i < 4; i++)
+			// 물건 위치
+			if (graph[ci][cj] == 'X')
 			{
-				// 체크 할 위치
-				int checkI = standardPos.first + checkDir[i].first;
-				int checkJ = standardPos.second + checkDir[i].second;
+				loop(j, home, xPos.size())
+				{
+					if (ci == xPos[j].lhs && cj == xPos[j].rhs)
+					{
+						// 현재 물건을 챙긴 조합
+						cc |= (1 << j);
 
-				// 경계체크
-				if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= m) continue;
+						if (dis[ci][cj][cc] <= dis[si][sj][sc] + 1) continue;
 
-				// 방문체크(거리로)
-				if (dis[checkI][checkJ] > 0) continue;
+						cp.push({ cc, {ci, cj} });
+						dis[ci][cj][cc] = dis[si][sj][sc] + 1;
+					}
+				}
 
-				// 벽체크
-				if (graph[checkI][checkJ] == '#') continue;
-
-				// 큐에저장, 거리저장
-				checkPos.push({ checkI, checkJ });
-				dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
+				continue;
 			}
+
+			// 빈공간
+			if (dis[ci][cj][sc] <= dis[si][sj][sc] + 1) continue;
+
+			cp.push({ sc, {ci, cj} });
+			dis[ci][cj][sc] = dis[si][sj][sc] + 1;
 		}
-
-		cout << dis[endPos.first][endPos.second] - 1 << '\n';
-
-		return 0;
 	}
+	// E 위치에 모든 물건을 챙겼을 때 거리
+	elp(dis[ePos.lhs][ePos.rhs][(1 << xPos.size()) - 1] - 1);
 
-	// 1.DFS로 가지러 갈 물건 순서 정하기
-	// 2.BFS로 순서대로 물건을 가지고 탈출하는 최단거리 갱신
-	DFS(0);
-
-	cout << minDis << '\n';
-
-	return 0;
+	return home;
 }
