@@ -51,7 +51,7 @@ using namespace std;
 const int MAX = 2147000000;
 const int MIN = -2147000000;
 
-vector<int> unf(1001);
+vector<int> unf(250001);
 
 int Find(int v)
 {
