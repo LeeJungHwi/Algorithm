@@ -1,293 +1,160 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <tuple>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-int n, m; // N, M 7, 3
-vector<pair<int, int> > virusPos; // 전체 바이러스위치 저장
-vector<pair<int, int> > activeVirus; // 활성화 바이러스 저장
-vector<pair<int, int> > deActiveVirus; // 비활성화 바이러스 저장
-vector<bool> virusVis(2500); // 바이러스 놓는 위치 m개 선택 방문체크
+#define home 0
 
-// DFS
-void DFS(int L, int cnt)
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+int n, m, ans = MAX;
+vector<pii> zeroPos, virusPos;
+queue<pii> cp; dir;
+vector<int> order;
+
+void DFS(int L, int s, int bitmask, vector<vector<int>>& graph, vector<vector<int>>& dis)
 {
-	if (L == virusPos.size() || cnt == m) // 종료조건 : 바이러스 위치 수를 넘긴경우나 m개의 활성화 바이러스를 선택한경우
+	if (L == m)
 	{
-		if (L == virusPos.size()) // 바이러스 위치 수를 넘긴경우
+		// 바이러스 활성화
+		loop(i, home, order.size())
 		{
-			if (cnt != m) // m개의 활성화 바이러스를 선택한게 아니면 리턴
+			cp.push(virusPos[order[i]]);
+			dis[virusPos[order[i]].lhs][virusPos[order[i]].rhs] = 1;
+		}
+
+		// 멀티 소스 BFS
+		int minDis = 1; // 바이러스를 놓자마자 전부 퍼진 상태일 수 있으므로 1로 초기화
+		int zeroCnt = zeroPos.size(); // 비활성화 바이러스 칸은 퍼지지 않아도 됨
+
+		while (!cp.empty())
+		{
+			int si = cp.front().lhs;
+			int sj = cp.front().rhs;
+			cp.pop();
+
+			loop(i, home, 4)
 			{
-				return;
+				int ci = si + cd[i].lhs;
+				int cj = sj + cd[i].rhs;
+
+				if (ci < home || cj < home || ci >= n || cj >= n) continue;
+				if (dis[ci][cj] > home) continue;
+				if (graph[ci][cj] == 1) continue;
+
+				cp.push({ ci, cj });
+				dis[ci][cj] = dis[si][sj] + 1;
+
+				// 빈 칸이 감염되었을 때만 최솟값 업데이트
+				if (graph[ci][cj] == home)
+				{
+					zeroCnt--;
+					minDis = max(minDis, dis[ci][cj]);
+				}
 			}
 		}
 
-		// 활성화 바이러스와 비활성화 바이러스 저장
-		for (int i = 0; i < virusPos.size(); i++)
-		{
-			if (virusVis[i])
-			{
-				activeVirus.push_back(virusPos[i]); // 활성화 바이러스
+		//for (auto a : dis)
+		//{
+		//	for (auto b : a)
+		//	{
+		//		scp(b);
+		//	}
+		//	elp(' ');
+		//}
+		//elp(' ');
 
-				continue;
-			}
+		// 거리 초기화 => 남아있는 빈 칸이 있으면 종료되므로 여기서 초기화 해야함
+		loop(i, home, n) loop(j, home, n) dis[i][j] = home;
 
-			deActiveVirus.push_back(virusPos[i]); // 비활성화 바이러스
-		}
+		// 남아있는 빈 칸이 있으면 X
+		if (zeroCnt > home) return;
+
+		// 모든 빈 칸에 바이러스가 퍼지는 시간 최솟값 업데이트
+		ans = min(ans, minDis);
 	}
 	else
 	{
-		virusVis[L] = true; // 활성화 바이러스 선택
-		DFS(L + 1, cnt += 1);
-		virusVis[L] = false; // 활성화 바이러스 미 선택
-		DFS(L + 1, cnt -= 1);
+		// 비중복조합
+		loop(i, s, virusPos.size())
+		{
+			if ((bitmask & (1 << i)) > home) continue;
+
+			order.push_back(i);
+			DFS(L + 1, i, bitmask | (1 << i), graph, dis);
+			order.pop_back();
+		}
 	}
 }
 
-// 연구소3
+// 연구소 3
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
+
+	// 바이러스 칸 중 m개 비중복조합 뽑아서 바이러스 활성화
+	// 모든 바이러스 위치부터 멀티 소스 BFS
+	// 비활성화 바이러스가 활성화 바이러스를 만나면 활성화
+	// 모든 빈 칸에 바이러스를 퍼뜨리는 시간 최솟값
 
 	cin >> n >> m;
-
-	vector<vector<int> > graph(n, vector<int>(n)); // 그래프
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	// 입력받을때 바이러스를 놓을수있는 위치는 따로 저장해놓고 일단 빈칸으로 둠
-	// 1. 활성화 바이러스 m개를 DFS로 선택하기
-	// 2. 선택한 m칸에 바이러스를 큐에 저장 후 거리 1로
-	// 3. 바이러스 BFS 돌리면서 거리할당하기
-	// 4. 바이러스가 빈칸에 모두 퍼지는 시간 = 거리 최대값, 비활성화 바이러스가 아닌 경우만 갱신
-	// 5. 바이러스가 빈칸에 모두 퍼졌을때만 최단시간 갱신 = 거리 최대값 중 최소값, 비활성화 바이러스가 아닌 경우만 갱신
-
-	//	2 0 0 0 1 1 0
-	//	0 0 1 0 1 2 0
-	//	0 1 1 0 1 0 0
-	//	0 1 0 0 0 0 0
-	//	0 0 0 2 0 1 1
-	//	0 1 0 0 0 0 0
-	//	2 1 0 0 0 0 2
-	// 바이러스 놓을 수 있는 위치는 따로 저장하고 일단 빈칸으로 둠
-	for (int i = 0; i < n; i++)
+	mat(int, graph, n, n);
+	mat(int, dis, n, n);
+	loop(i, home, n) loop(j, home, n)
 	{
-		for (int j = 0; j < n; j++)
-		{
-			cin >> graph[i][j];
+		cin >> graph[i][j];
 
-			if (graph[i][j] == 2)
-			{
-				graph[i][j] = 0; // 일단 빈칸으로
-				virusPos.push_back({ i, j }); // 바이러스 위치 저장
-			}
-		}
+		// 빈 칸 위치, 바이러스 위치 저장
+		if (graph[i][j] == home) zeroPos.push_back({ i, j });
+		else if (graph[i][j] == 2) virusPos.push_back({ i, j });
 	}
 
-	// 비활성화 바이러스 계수
-	/*
-	1. m = 3 일때
-	0 ~ 3 -> (i = 0) coef * (virusPos.size - m) ~ coef * (virusPos.size - m) + virusPos.size - m
-	4 ~ 7 -> (i = 3) coef * (virusPos.size - m) ~ coef * (virusPos.size - m) + virusPos.size - m
-	8 ~ 11 -> (i = 6) coef * (virusPos.size - m) ~ coef * (virusPos.size - m) + virusPos.size - m
-	....
-	2. m = 5 일때
-	0 ~ 1 -> (i = 0) coef * (virusPos.size - m) ~ coef * (virusPos.size - m) + virusPos.size - m
-	2 ~ 3 -> (i = 5) coef * (virusPos.size - m) ~ coef * (virusPos.size - m) + virusPos.size - m
-	4 ~ 5 -> (i = 10) coef * (virusPos.size - m) ~ coef * (virusPos.size - m) + virusPos.size - m
-	....
-	*/
-	int coef = 0;
+	DFS(home, home, home, graph, dis);
+	elp(cond(ans == MAX, -1, ans - 1));
 
-	// 1. 바이러스를 놓을수있는 칸 중 m개를 DFS로 선택하기
-	DFS(0, 0);
-
-	int minMaxDis = 2147000000; // 바이러스가 모두 퍼지는 시간 중 최소값
-
-	// 2. 선택한 m칸에 바이러스를 큐에 저장 후 거리 1로
-	for (int i = 0; i < activeVirus.size(); i += m)
-	{
-		vector<vector<int> > dis(n, vector<int>(n)); // 거리
-		int maxDis = 1; // 바이러스가 모두 퍼지는 시간 : 바이러스를 놓자마자 퍼지는 경우 1
-
-		for (int j = i; j < i + m; j++)
-		{
-			checkPos.push(activeVirus[j]);
-			dis[activeVirus[j].first][activeVirus[j].second] = 1;
-		}
-
-		// 3. 바이러스 BFS 돌리면서 거리할당하기
-		while (!checkPos.empty()) // 큐가 빌때까지
-		{
-			// 기준위치 꺼냄
-			pair<int, int> standardPos = checkPos.front();
-			checkPos.pop();
-
-			// 상하좌우
-			for (int j = 0; j < 4; j++)
-			{
-				// 체크 할 위치
-				int checkI = standardPos.first + checkDir[j].first;
-				int checkJ = standardPos.second + checkDir[j].second;
-
-				// 경계체크
-				if (checkI < 0 || checkJ < 0 || checkI >= n || checkJ >= n)
-				{
-					continue;
-				}
-
-				// 벽체크
-				if (graph[checkI][checkJ] == 1)
-				{
-					continue;
-				}
-
-				// 거리가 할당되지 않았다면 큐에 저장 후 거리 할당
-				if (dis[checkI][checkJ] == 0)
-				{
-					checkPos.push({ checkI, checkJ });
-					dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-
-					// 4. 바이러스가 빈칸에 모두 퍼지는 시간 = 거리 최대값
-
-					// 비활성화 바이러스인지 체크
-					bool isVirus = false;
-
-					for (int k = coef * (virusPos.size() - m); k < coef * (virusPos.size() - m) + virusPos.size() - m; k++)
-					{
-						if (checkI == deActiveVirus[k].first && checkJ == deActiveVirus[k].second)
-						{
-							isVirus = true;
-							break;
-						}
-
-						if (isVirus)
-						{
-							break;
-						}
-					}
-
-					// 비활성화 바이러스가 아닌 경우만 거리 최대값 갱신
-					if (!isVirus)
-					{
-						maxDis = max(maxDis, dis[checkI][checkJ]);
-					}
-				}
-				else // 거리가 할당되어있다면 거리가 더 작을때만 큐에 저장 후 거리 할당
-				{
-					if (dis[checkI][checkJ] > dis[standardPos.first][standardPos.second] + 1)
-					{
-						checkPos.push({ checkI, checkJ });
-						dis[checkI][checkJ] = dis[standardPos.first][standardPos.second] + 1;
-
-						// 4. 바이러스가 빈칸에 모두 퍼지는 시간 = 거리 최대값
-
-						// 비활성화 바이러스인지 체크
-						bool isVirus = false;
-
-						for (int k = coef * (virusPos.size() - m); k < coef * (virusPos.size() - m) + virusPos.size() - m; k++)
-						{
-							if (checkI == deActiveVirus[k].first && checkJ == deActiveVirus[k].second)
-							{
-								isVirus = true;
-								break;
-							}
-
-							if (isVirus)
-							{
-								break;
-							}
-						}
-
-						// 비활성화 바이러스가 아닌 경우만 거리 최대값 갱신
-						if (!isVirus)
-						{
-							maxDis = max(maxDis, dis[checkI][checkJ]); 
-						}
-					}
-				}
-			}
-		}
-
-		// 5. 바이러스가 빈칸에 모두 퍼졌을때만 최단시간 갱신 = 거리 최대값 중 최소값
-		// 비활성화 바이러스가 아닌 경우만 최단시간 갱신
-
-		bool isAll = true;
-
-		for (int j = 0; j < n; j++)
-		{
-			for (int k = 0; k < n; k++)
-			{
-				if (graph[j][k] != 1) // 벽이 아니면서
-				{
-					// 비활성화 바이러스인지 체크
-					bool isVirus = false;
-
-					for (int l = coef * (virusPos.size() - m); l < coef * (virusPos.size() - m) + virusPos.size() - m; l++)
-					{
-						if (j == deActiveVirus[l].first && k == deActiveVirus[l].second)
-						{
-							isVirus = true;
-							break;
-						}
-
-						if (isVirus)
-						{
-							break;
-						}
-					}
-
-					if (!isVirus) // 비활성화 바이러스가 아닌경우
-					{
-						if (dis[j][k] == 0) // 거리가 하나라도 할당되지 않았으면 모두 퍼지지 못함
-						{
-							isAll = false;
-							break;
-						}
-					}
-				}
-
-				if (!isAll)
-				{
-					break;
-				}
-			}
-
-			if (!isAll)
-			{
-				break;
-			}
-		}
-
-		if (isAll) // 바이러스가 모두 퍼진 경우만 최단시간 갱신
-		{
-			minMaxDis = min(minMaxDis, maxDis);
-		}
-
-		// 비활성화 바이러스 계수 증가
-		coef++;
-	}
-
-	// 최단시간이 갱신되지않았다면 어떻게 바이러스를 놓아도 퍼지지 않으므로 -1 출력
-	if (minMaxDis == 2147000000)
-	{
-		cout << -1 << '\n';
-
-		return 0;
-	}
-
-	// 거리 1로 시작했으므로 1 빼줌
-	cout << minMaxDis - 1 << '\n';
-
-	return 0;
+	return home;
 }
