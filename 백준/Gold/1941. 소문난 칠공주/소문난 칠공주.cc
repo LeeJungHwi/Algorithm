@@ -1,142 +1,136 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-vector<vector<char> > graph(5, vector<char>(5)); // 그래프
-vector<pair<int, int> > checkDir = { {-1, 0},{1, 0},{0, -1},{0, 1} }; // 상하좌우
-int sevenPrincessCnt; // 소문난 칠공주를 결성하는 경우의 수
+#define home 0
 
-// BFS
-// 7명의 공주들이 인접하는지 체크
-void BFS(int selected[])
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+vector<vector<char>> graph(5, vector<char>(5));
+vector<vector<bool>> vis(5, vector<bool>(5, true));
+queue<pii> cp; dir;
+vector<pii> sPos;
+vector<int> order;
+int ans;
+
+void DFS(int L, int s, int bitmask)
 {
-	queue<int> checkPos; // 체크 할 위치
-	vector<char> vis(7, false); // 방문체크
-
-	// 첫번째 공주 선택
-	vis[0] = true;
-	checkPos.push(selected[0]);
-
-	int cnt = 1; // 총 인접한 수
-	int cntS = 0; // 이다솜파 수
-
-	// 큐가 빌때까지
-	while (!checkPos.empty())
+	if (L == 7)
 	{
-		// 기준위치 꺼냄
-		int standardPos = checkPos.front();
-		checkPos.pop();
+		// 선택한 7명 위치 vis를 false로
+		loop(i, home, order.size()) vis[sPos[order[i]].lhs][sPos[order[i]].rhs] = false;
 
-		// 이다솜파 카운팅
-		if (graph[standardPos / 5][standardPos % 5] == 'S')
-		{
-			cntS++;
-		}
+		// 첫번째 공주 부터 BFS
+		cp.push(sPos[order[home]]);
+		vis[sPos[order[home]].lhs][sPos[order[home]].rhs] = true;
+		int adjoinCnt = 1; // 인접한 수
+		int idasomCnt = cond(graph[sPos[order[home]].lhs][sPos[order[home]].rhs] == 'S', 1, home); // 이다솜파 수
 
-		// 상하좌우
-		for (int i = 0; i < 4; i++)
+		while (!cp.empty())
 		{
-			// 나머지 공주 인접하는지 체크
-			for (int checkSelected = 1; checkSelected < 7; checkSelected++)
+			int si = cp.front().lhs;
+			int sj = cp.front().rhs;
+			cp.pop();
+
+			loop(i, home, 4)
 			{
-				// 방문체크
-				if (vis[checkSelected])
-				{
-					continue;
-				}
+				int ci = si + cd[i].lhs;
+				int cj = sj + cd[i].rhs;
 
-				// 인접체크
-				if (standardPos % 5 + checkDir[i].first != selected[checkSelected] % 5 || standardPos / 5 + checkDir[i].second != selected[checkSelected] / 5)
-				{
-					continue;
-				}
-				
-				// 인접한 공주임
-				vis[checkSelected] = true;
-				checkPos.push(selected[checkSelected]);
-				cnt++;
+				if (ci < home || cj < home || ci >= 5 || cj >= 5) continue;
+				if (vis[ci][cj]) continue;
+
+				cp.push({ ci, cj });
+				vis[ci][cj] = true;
+				adjoinCnt++;
+				if (graph[ci][cj] == 'S') idasomCnt++;
 			}
 		}
-	}
 
-	// 인접한 공주가 7명이면서 이다솜파가 4명 이상이면 카운팅
-	if (cnt == 7 && cntS >= 4)
+		// 방문 초기화
+		loop(i, home, 5) loop(j, home, 5) vis[i][j] = true;
+
+		// 인접하지 않거나 이다솜파가 4명 이상이 아니면 X
+		if (adjoinCnt != 7 || idasomCnt < 4) return;
+
+		ans++;
+	}
+	else
 	{
-		sevenPrincessCnt++;
+		// 비중복조합
+		loop(i, s, sPos.size())
+		{
+			if ((bitmask & (1 << i)) > home) continue;
+
+			order.push_back(i);
+			DFS(L + 1, i, bitmask | (1 << i));
+			order.pop_back();
+		}
 	}
-}
-
-// DFS
-// 7명의 공주 선택
-void DFS(int selected[], int curSelected, int L, int leftSelected)
-{
-	// 남은 선택 횟수가 0이면
-	// 7명의 공주가 인접한지 체크 후 이다솜파가 4명 이상이면 카운팅
-	if (leftSelected == 0)
-	{
-		BFS(selected);
-
-		return;
-	}
-
-	// 선택 가능한 공주 수를 넘긴경우 리턴
-	if (L == 25)
-	{
-		return;
-	}
-
-	selected[curSelected] = L;
-	DFS(selected, curSelected + 1, L + 1, leftSelected - 1); // 선택
-	DFS(selected, curSelected, L + 1, leftSelected); // 미선택
 }
 
 // 소문난 칠공주
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	/*
-	1. 7명의 여학생들로 구성
-	2. 7명의 자리는 가로 또는 세로로 반드시 인접해있어야 함
-	3. 이다솜파의 학생들로만 구성될 필요는 없음
-	4. 이다솜파가 적어도 4명 이상은 포함되어야 함
-
-	소문난 칠공주를 결성하는 경우의 수 구하기
-	*/
-
-	//	YYYYY
-	//	SYSYS
-	//	YYYYY
-	//	YSYYS
-	//	YYYYY
-
-	string inputString; // 입력문자열
-
-	for (int i = 0; i < 5; i++)
+	// 비중복조합 7개 위치 뽑음
+	// 7개 위치가 인접하고 이다솜파가 4명 이상이면 카운팅
+	// vis를 true로 초기화하고 선택한 7개 위치만 false로
+	// BFS 돌려서 인접하는지, 이다솜파가 4명 이상인지 확인
+	loop(i, home, 5) loop(j, home, 5)
 	{
-		cin >> inputString;
-
-		for (int j = 0; j < 5; j++)
-		{
-			graph[i][j] = inputString[j];
-		}
+		cin >> graph[i][j];
+		sPos.push_back({ i, j });
 	}
 
-	// DFS
-	// 1.25명의 공주 중 7 명 선택 (순서 고려 X)
-	// 2.선택된 공주들이 인접하는지 체크
-	// 3.이다솜파가 4명 이상인지 체크 후 카운팅
-	DFS(new int[7], 0, 0, 7);
+	DFS(home, home, home);
+	elp(ans);
 
-	// 소문난 칠공주를 결성하는 경우의 수 출력
-	cout << sevenPrincessCnt << '\n';
-
-	return 0;
+	return home;
 }
