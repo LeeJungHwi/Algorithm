@@ -1,169 +1,139 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
 
-// DSLR
-int DSLR(int num, char type)
-{
-	switch (type)
-	{
-		case 'D':
-		{
-			// n을 두배로
-			int temp = 2 * num;
+#define home 0
 
-			// 9999보다 큰 경우 모듈러
-			if (temp > 9999)
-			{
-				temp %= 10000;
-			}
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
 
-			return temp;
-		}
-		case 'S':
-		{
-			// n - 1
-			int temp = num - 1;
+#define ll long long
+#define ld long double
 
-			// 0이면 9999
-			if (num == 0)
-			{
-				temp = 9999;
-			}
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
 
-			return temp;
-		}
-		case 'L':
-		{
-			// 왼쪽으로 회전
-			int d1 = num / 1000;  // 천의 자리
-			int d2 = (num % 1000) / 100;  // 백의 자리
-			int d3 = (num % 100) / 10;  // 십의 자리
-			int d4 = num % 10;  // 일의 자리
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
 
-			if (d1 == 0 && d2 == 0 && d3 == 0) // 한 자릿수
-			{
-				return d4 * 10;
-			}
-			else if (d1 == 0 && d2 == 0) // 두 자릿수
-			{
-				return d3 * 100 + d4 * 10;
-			}
-			else if (d1 == 0) // 세 자릿수
-			{
-				return d2 * 1000 + d3 * 100 + d4 * 10;
-			}
-			else // 네 자릿수
-			{
-				return d2 * 1000 + d3 * 100 + d4 * 10 + d1;
-			}
-		}
-		case 'R':
-		{
-			// 오른쪽으로 회전
-			int d1 = num / 1000;  // 천의 자리
-			int d2 = (num % 1000) / 100;  // 백의 자리
-			int d3 = (num % 100) / 10;  // 십의 자리
-			int d4 = num % 10;  // 일의 자리
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
 
-			if (d1 == 0 && d2 == 0 && d3 == 0) // 한 자릿수
-			{
-				return d4 * 1000;
-			}
-			else if (d1 == 0 && d2 == 0) // 두 자릿수
-			{
-				return d4 * 1000 + d3;
-			}
-			else if (d1 == 0) // 세 자릿수
-			{
-				return d4 * 1000 + d2 * 10 + d3;
-			}
-			else // 네 자릿수
-			{
-				return d4 * 1000 + d1 * 100 + d2 * 10 + d3;
-			}
-		}
-	}
-}
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // DSLR
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int n; // N 3
-	cin >> n;
+	// D => 2 * n, n이 9999보다 크면 % 10000
+	// S => n - 1, n이 0이면 9999
+	// L => <<
+	// R => >>
 
-	vector<char> dslr; // DSLR
-	dslr.push_back('D');
-	dslr.push_back('S');
-	dslr.push_back('L');
-	dslr.push_back('R');
+	int tc; cin >> tc;
+	vector<bool> vis(10000);
+	queue<pair<int, string>> cp; // (위치, 명령어)
+	vector<int> d(4);
+	map<int, char> dirMap = { {home, 'D'}, {1, 'S'}, {2, 'L'}, {3, 'R'} };
 
-	//	1234 3412
-	//	1000 1
-	//	1 16
-	for (int i = 0; i < n; i++)
+	while (tc--)
 	{
-		int A, B;
-		cin >> A >> B;
+		int sPos, ePos; cin >> sPos >> ePos;
 
-		queue<pair<int, string>> checkPos; // 체크 할 위치와 명령어 순서 저장
-		vector<bool> vis(10000); // 방문체크
+		cp.push({ sPos, "" });
+		vis[sPos] = true;
 
-		// 1234 부터 BFS 돌리기
-		// 1000 부터 BFS 돌리기
-		// 1 부터 BFS 돌리기
-		checkPos.push({ A, "" });
-		vis[A] = true;
-
-		while (!checkPos.empty()) // 큐가 빌때까지
+		while (!cp.empty())
 		{
-			// 기준위치 꺼냄
-			pair<int, string> standardPos = checkPos.front();
-			checkPos.pop();
+			int s = cp.front().lhs;
+			string p = cp.front().rhs;
+			cp.pop();
 
-			// 종료조건 : B로 변환이 완료되었을때 명령어 순서 출력 후 종료
-			if (standardPos.first == B)
+			// 도착
+			if (s == ePos) { elp(p); break; }
+
+			// 다음 위치 설정
+			d[home] = (2 * s) % 10000;
+			d[1] = cond(s == home, 9999, s - 1);
+
+			// 자릿수
+			int s1 = s % 10;
+			int s2 = (s % 100) / 10;
+			int s3 = (s % 1000) / 100;
+			int s4 = s / 1000;
+
+			// 한자리
+			if (s4 == home && s3 == home && s2 == home)
 			{
-				cout << standardPos.second << '\n';
-				break;
+				d[2] = s1 * 10;
+				d[3] = s1 * 1000;
+			}
+			// 두자리
+			else if (s4 == home && s3 == home)
+			{
+				d[2] = s1 * 10 + s2 * 100;
+				d[3] = s1 * 1000 + s2;
+			}
+			// 세자리
+			else if (s4 == home)
+			{
+				d[2] = s1 * 10 + s2 * 100 + s3 * 1000;
+				d[3] = s1 * 1000 + s2 + s3 * 10;
+			}
+			// 네자리
+			else
+			{
+				d[2] = s1 * 10 + s2 * 100 + s3 * 1000 + s4;
+				d[3] = s1 * 1000 + s2 + s3 * 10 + s4 * 100;
 			}
 
-			// DSLR
-			int checkNum; // 체크 할 위치
-			string checkCommand; // 명령어 순서
-
-			for (int i = 0; i < 4; i++)
+			loop(i, home, 4)
 			{
-				checkNum = DSLR(standardPos.first, dslr[i]);
+				int c = d[i];
 
-				// 방문체크
-				if (vis[checkNum])
-				{
-					continue;
-				}
+				if (c < home || c > 10000) continue;
+				if (vis[c]) continue;
 
-				// 경계체크
-				if (checkNum < 0 || checkNum > 10000)
-				{
-					continue;
-				}
-
-				// 방문체크, 이전 명령어 순서 + 수행한 명령어로 명령어 갱신, 큐에 저장
-				vis[checkNum] = true;
-				checkCommand = standardPos.second + dslr[i];
-				checkPos.push({ checkNum, checkCommand });
+				cp.push({ c, p + dirMap[i] });
+				vis[c] = true;
 			}
 		}
+
+		// 초기화
+		while (!cp.empty()) cp.pop();
+		loop(i, home, 10000) vis[i] = false;
 	}
 
-	return 0;
+	return home;
 }
