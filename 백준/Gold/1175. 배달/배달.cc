@@ -32,8 +32,7 @@ using namespace std;
 #define gmat(t, v, r) vector<vector<t> > v((r))
 #define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
 #define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
-#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
-#define ismat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))));
+#define smat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))));
 
 #define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
 #define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
@@ -57,7 +56,7 @@ int main()
 	// BFS 내부에서 배달 위치와 빈공간인 경우로 뻗어나감
 	int n, m; cin >> n >> m;
 	mat(char, graph, n, m);
-	ismat(int, dis, n, m, 4, 4, MAX); // dis[i][j][k][l] => i,j를 k방향에서 왔을 때 배달 상태가 l일 때 최단거리
+	smat(int, dis, n, m, 4, 4); // dis[i][j][k][l] => i,j를 k방향에서 왔을 때 배달 상태가 l일 때 최단거리
 	queue<pair<pii, pii>> cp; dir; // (방향, 배달 상태, 위치)
 	pii sPos;
 	tvec(pii, cPos);
@@ -120,12 +119,12 @@ int main()
 
 			int ci = si + cd[i].lhs;
 			int cj = sj + cd[i].rhs;
+			int cc = sc;
 
 			if (ci < home || cj < home || ci >= n || cj >= m) continue;
 			if (graph[ci][cj] == '#') continue;
 
 			// 배달 위치
-			int bitmask = home;
 			if (graph[ci][cj] == 'C')
 			{
 				loop(j, home, 2)
@@ -134,13 +133,13 @@ int main()
 					{
 						// c1 => 01
 						// c2 => 10
-						bitmask = 1 << j;
-
 						// sc | bitmask => 배달 위치를 방문한 비트로 바꿈
-						if (dis[ci][cj][i][sc | bitmask] <= dis[si][sj][sd][sc] + 1) continue;
+						cc |= 1 << j;
 
-						cp.push({ {i, sc | bitmask}, {ci, cj} });
-						dis[ci][cj][i][sc | bitmask] = dis[si][sj][sd][sc] + 1;
+						if (dis[ci][cj][i][cc] > home) continue;
+
+						cp.push({ {i, sc | cc}, {ci, cj} });
+						dis[ci][cj][i][cc] = dis[si][sj][sd][sc] + 1;
 					}
 				}
 
@@ -148,7 +147,7 @@ int main()
 			}
 
 			// 빈공간
-			if (dis[ci][cj][i][sc] <= dis[si][sj][sd][sc] + 1) continue;
+			if (dis[ci][cj][i][sc] > home) continue;
 
 			cp.push({ {i, sc}, {ci, cj} });
 			dis[ci][cj][i][sc] = dis[si][sj][sd][sc] + 1;
