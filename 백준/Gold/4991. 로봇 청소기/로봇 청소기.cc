@@ -76,7 +76,7 @@ int main()
 			if (graph[i][j] == 'o') sPos = { i, j };
 			else if (graph[i][j] == '*') dirtyPos.push_back({ i, j });
 		}
-		ismat(int, dis, n, m, 1 << dirtyPos.size(), MAX); // dis[i][j][k] => i,j에서 더러운 칸 조합 상태가 k일 때 최단거리
+		smat(int, dis, n, m, 1 << dirtyPos.size()); // dis[i][j][k] => i,j에서 더러운 칸 조합 상태가 k일 때 최단거리
 
 		cp.push({ home, sPos });
 		dis[sPos.lhs][sPos.rhs][home] = 1;
@@ -116,7 +116,7 @@ int main()
 							// 현재 더러운 칸을 청소한 조합
 							cc |= (1 << j);
 
-							if (dis[ci][cj][cc] <= dis[si][sj][sc] + 1) continue;
+							if (dis[ci][cj][cc] > home) continue;
 
 							cp.push({ cc, {ci, cj} });
 							dis[ci][cj][cc] = dis[si][sj][sc] + 1;
@@ -127,7 +127,7 @@ int main()
 				}
 
 				// 빈공간
-				if (dis[ci][cj][sc] <= dis[si][sj][sc] + 1) continue;
+				if (dis[ci][cj][sc] > home) continue;
 
 				cp.push({ sc, {ci, cj} });
 				dis[ci][cj][sc] = dis[si][sj][sc] + 1;
