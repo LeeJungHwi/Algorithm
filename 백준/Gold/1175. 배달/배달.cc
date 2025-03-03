@@ -136,9 +136,6 @@ int main()
 						// c2 => 10
 						bitmask = 1 << j;
 
-						// sc & bitmask => 현재 배달 조합에서 배달 위치 비트를 사용했는지 체크
-						if ((sc & bitmask) == 1) continue;
-
 						// sc | bitmask => 배달 위치를 방문한 비트로 바꿈
 						if (dis[ci][cj][i][sc | bitmask] <= dis[si][sj][sd][sc] + 1) continue;
 
