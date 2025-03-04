@@ -1,200 +1,157 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <fstream>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // 열쇠
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	int tc; // TC 3
-	cin >> tc;
+	// 종료 조건 => 더 이상 획득한 열쇠가 없을 때 까지
+	// 시작 위치 => n + 2, m + 2 크기 그래프의 0,0에서 시작
+	// 열쇠 관리 => 비트마스크
+	// 1.대문자를 만나면 열쇠가 있으면 빈공간으로
+	// 2.소문자를 만나면 열쇠 추가하고 빈공간으로
+	// 3.문서를 만나면 획득한 문서 개수 카운팅하고 빈공간으로
 
-	int h, w; // H, W 5, 17
-	string inputString; // 입력문자열
+	int tc; cin >> tc;
 
-	queue<pair<int, int> > checkPos; // 체크 할 위치
-	vector<pair<int, int> > checkDir; // 상하좌우
-	checkDir.push_back({ -1, 0 });
-	checkDir.push_back({ 1, 0 });
-	checkDir.push_back({ 0, -1 });
-	checkDir.push_back({ 0, 1 });
-
-	// TC 개수만큼 돌면서
+	queue<pii> cp; dir;
 	while (tc--)
 	{
-		cin >> h >> w;
+		int n, m; cin >> n >> m;
+		mat(char, graph, n + 2, m + 2);
+		mat(bool, vis, n + 2, m + 2);
+		int bitmask = home;
+		loop(i, 1, n + 1) loop(j, 1, m + 1) cin >> graph[i][j];
 
-		vector<vector<char> > graph(h, vector<char>(w)); // 그래프
-		vector<pair<int, int> > borderPos; // 그래프의 경계 좌표
-		map<char, int> keys; // 소유중인 열쇠
-		int docuCnt = 0; // 훔친 문서 개수
-
-		//	*****************
-		//	.............**$*
-		//	*B*A*P*C**X*Y*.X.
-		//	*y*x*a*p**$*$**$*
-		//	*****************
-		// 상근이가 시작할수있는 위치 : 일단 경계 좌표이면서 벽이 아닌 좌표만 저장
-		for (int i = 0; i < h; i++)
+		// 처음에 가지고 있는 열쇠 추가
+		string is;
+		cin >> is;
+		loop(i, home, is.size())
 		{
-			cin >> inputString;
-
-			for (int j = 0; j < w; j++)
-			{
-				graph[i][j] = inputString[j];
-
-				if ((i == 0 || j == 0 || i == h - 1 || j == w - 1) && graph[i][j] != '*')
-				{
-					borderPos.push_back({ i, j });
-				}
-			}
+			if (is[i] == '0') break;
+			bitmask |= (1 << (is[i] - 'a'));
 		}
 
-		cin >> inputString;
-
-		// cz
-		for (int i = 0; i < inputString.size(); i++)
-		{
-			keys[inputString[i]]++;
-		}
-
-		// 상근이 시작위치부터 BFS 돌리면서 더이상 열쇠를 발견하지 못하면 종료
+		int ans = home; // 획득한 문서 개수
 		while (true)
 		{
-			vector<vector<bool> > vis(h, vector<bool>(w)); // 방문체크
-			int findKeyCnt = 0; // 열쇠를 찾은 횟수
+			bool isKey = false; // 열쇠를 획득했는지 체크
 
-			// 상근이가 시작할수있는 위치
-			// 1. 경계의 벽이아닌곳에서 빈칸인곳
-			// 2. 경계의 벽이아닌곳에서 대문자면 해당 열쇠를 가지고 있는곳
-			// 3. 경계의 벽이아닌곳에서 소문자면 해당 열쇠 맵핑하고 빈칸으로
-			// 4. 경계의 벽이아닌곳에서 문서면 훔친 문서 개수 카운팅 후 빈칸으로 
-			for (int i = 0; i < borderPos.size(); i++)
+			cp.push({ home, home });
+			vis[home][home] = true;
+
+			while (!cp.empty())
 			{
-				// 일단 현재 경계의 문자를 가져옴
-				char curChar = graph[borderPos[i].first][borderPos[i].second];
+				int si = cp.front().lhs;
+				int sj = cp.front().rhs;
+				cp.pop();
 
-				if (isupper(curChar)) // 대문자면
+				loop(i, home, 4)
 				{
-					if (keys[tolower(graph[borderPos[i].first][borderPos[i].second])] == 0)
+					int ci = si + cd[i].lhs;
+					int cj = sj + cd[i].rhs;
+
+					if (ci < home || cj < home || ci >= n + 2 || cj >= m + 2) continue;
+					if (vis[ci][cj]) continue;
+					if (graph[ci][cj] == '*') continue;
+
+					// 문
+					if (isupper(graph[ci][cj]))
 					{
-						continue;
+						// 열쇠가 없으면 X
+						if ((bitmask & (1 << (graph[ci][cj] - 'A'))) == home) continue;
+
+						// 열쇠가 있으면 빈공간으로
+						graph[ci][cj] = '.';
 					}
-					else
+					// 열쇠
+					else if (islower(graph[ci][cj]))
 					{
-						graph[borderPos[i].first][borderPos[i].second] = '.';
+						// 열쇠 추가
+						bitmask |= 1 << (graph[ci][cj] - 'a');
+
+						// 빈공간으로
+						graph[ci][cj] = '.';
+
+						// 열쇠 획득
+						isKey = true;
 					}
-				}
-				else if (islower(curChar)) // 소문자면
-				{
-					keys[graph[borderPos[i].first][borderPos[i].second]]++;
-					graph[borderPos[i].first][borderPos[i].second] = '.';
-					findKeyCnt++;
-				}
-				else if (curChar == '$') // 문서면
-				{
-					docuCnt++;
-					graph[borderPos[i].first][borderPos[i].second] = '.';
-				}
-
-				checkPos.push(borderPos[i]);
-				vis[borderPos[i].first][borderPos[i].second] = true;
-			}
-
-			while (!checkPos.empty()) // 큐가 빌때까지
-			{
-				// 기준위치 꺼냄
-				pair<int, int> standardPos = checkPos.front();
-				checkPos.pop();
-
-				// 상하좌우
-				for (int i = 0; i < 4; i++)
-				{
-					// 체크 할 위치
-					int checkI = standardPos.first + checkDir[i].first;
-					int checkJ = standardPos.second + checkDir[i].second;
-
-					// 경계체크
-					if (checkI < 0 || checkJ < 0 || checkI >= h || checkJ >= w)
+					// 문서
+					else if (graph[ci][cj] == '$')
 					{
-						continue;
+						// 문서 개수 카운팅
+						ans++;
+
+						// 빈공간으로
+						graph[ci][cj] = '.';
 					}
 
-					// 방문체크
-					if (vis[checkI][checkJ])
-					{
-						continue;
-					}
-
-					// 벽체크
-					if (graph[checkI][checkJ] == '*')
-					{
-						continue;
-					}
-
-					// 알파벳 대문자를 만나면 해당 대문자를 열수있는 열쇠가 없으면 continue 있으면 빈칸으로
-					if (isupper(graph[checkI][checkJ]))
-					{
-						if (keys[tolower(graph[checkI][checkJ])] == 0)
-						{
-							continue;
-						}
-						else
-						{
-							graph[checkI][checkJ] = '.';
-						}
-					}
-
-					// 알파벳 소문자를 만나면 해당 열쇠를 맵핑하고 빈칸으로 바꿈
-					if (islower(graph[checkI][checkJ]))
-					{
-						keys[graph[checkI][checkJ]]++;
-						graph[checkI][checkJ] = '.';
-						findKeyCnt++;
-					}
-
-					// 문서를 만나면 훔친 문서 카운팅하고 빈칸으로 바꿈
-					if (graph[checkI][checkJ] == '$')
-					{
-						docuCnt++;
-						graph[checkI][checkJ] = '.';
-					}
-
-					// 큐에저장 방문체크
-					checkPos.push({ checkI, checkJ });
-					vis[checkI][checkJ] = true;
+					cp.push({ ci, cj });
+					vis[ci][cj] = true;
 				}
 			}
 
-			// 디버깅용
-			//for (auto a : graph)
-			//{
-			//	for (auto b : a)
-			//	{
-			//		cout << b << ' ';
-			//	}
-			//	cout << '\n';
-			//}
+			// 열쇠를 획득하지 못 했으면 종료
+			if (!isKey) break;
 
-			// 열쇠를 발견한 횟수가 없으면 종료
-			if (findKeyCnt == 0)
-			{
-				break;
-			}
+			// 방문체크 초기화
+			loop(i, home, n + 2) loop(j, home, m + 2) vis[i][j] = false;
 		}
 
-		// 훔친 문서의 갯수 출력
-		cout << docuCnt << '\n';
+		// 획득한 문서 개수 출력
+		elp(ans);
 	}
 
-	return 0;
+	return home;
 }
