@@ -97,8 +97,7 @@ int main()
 
 			if (ci < home || cj < home || ci >= n || cj >= m) break;
 			if (graph[ci][cj] == 1) break;
-			// 기존 명령 횟수 보다 더 많은 명령으로 왔다면 X
-			if (dis[ci][cj][sd] > home && dis[ci][cj][sd] <= cc) continue;
+			if (dis[ci][cj][sd] > home) continue;
 
 			cp.push({ {ci, cj}, {sd, cc} });
 			dis[ci][cj][sd] = cc;
