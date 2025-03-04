@@ -49,17 +49,17 @@ int main()
 {
 	init;
 
-	// 가장자리 외부공기를 모두 큐에넣고 멀티소스BFS로 -1로 마킹하기
-	// 녹은 치즈(-1)를 제외한 모든 치즈 위치에 대해서 상하좌우 보면서 -1로 마킹된 외부 공기를 만나면 녹을 치즈로 판별
+	// 그래프의 크기를 n + 2, m + 2로 하고 0,0 부터 BFS 돌려서 외부 공기 -1로 마킹
+	// 녹은 치즈(-1)를 제외한 모든 치즈 위치에 대해서 상하좌우 보면서 -1로 마킹된 외부 공기를 만나면 녹을 치즈로 판별 => 녹을 치즈는 한 번에 없애야함
 	// 남아있는 치즈 개수와 녹일 치즈의 개수가 같으면 종료
 	// 아직 전부 녹지 않으면 치즈를 녹여 외부공기(-1)로 만들고 다음 외부공기 판별을 위해 큐에 추가
 
 	int n, m; cin >> n >> m;
-	mat(int, graph, n, m);
+	mat(int, graph, n + 2, m + 2);
 	queue<pii> cp; dir;
 	tvec(pii, cheesePos); // 치즈 위치
 	int cheeseCnt = home; // 남아있는 치즈 개수
-	loop(i, home, n) loop(j, home, m)
+	loop(i, 1, n + 1) loop(j, 1, m + 1)
 	{
 		cin >> graph[i][j];
 		if (graph[i][j] == 1)
@@ -69,40 +69,16 @@ int main()
 		}
 	}
 
-	// 가장자리 외부공기를 모두 큐에넣기
-	loop(i, home, n)
-	{
-		if (graph[i][home] == home && graph[i][home] != -1)
-		{
-			graph[i][home] = -1;
-			cp.push({ i, home });
-		}
-		if (graph[i][m - 1] == home && graph[i][m - 1] != -1)
-		{
-			graph[i][m - 1] = -1;
-			cp.push({ i, m - 1 });
-		}
-	}
-	loop(i, home, m)
-	{
-		if (graph[home][i] == home && graph[home][i] != -1)
-		{
-			graph[home][i] = -1;
-			cp.push({ home, i });
-		}
-		if (graph[n - 1][i] == home && graph[n - 1][i] != -1)
-		{
-			graph[n - 1][i] = -1;
-			cp.push({ n - 1, i });
-		}
-	}
+	// 0,0 부터 BFS 돌려서 외부 공기 -1로 마킹
+	cp.push({ home, home });
+	graph[home][home] = -1;
 
 	int ans = home; // 치즈를 모두 녹이는데 걸리는 시간
 	while (true)
 	{
 		ans++; // 1시간 후
 
-		// 멀티소스BFS로 -1로 마킹하기
+		// BFS로 외부 공기 -1로 마킹
 		while (!cp.empty())
 		{
 			int si = cp.front().lhs;
@@ -114,7 +90,7 @@ int main()
 				int ci = si + cd[i].lhs;
 				int cj = sj + cd[i].rhs;
 
-				if (ci < home || cj < home || ci >= n || cj >= m) continue;
+				if (ci < home || cj < home || ci >= n + 2|| cj >= m + 2) continue;
 				if (graph[ci][cj] != home) continue;
 
 				cp.push({ ci, cj });
