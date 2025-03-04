@@ -60,7 +60,6 @@ int main()
 	mat(char, graph, n, m);
 	smat(int, dis, n, m, pow(2, 6)); // dis[i][j][k] => i,j에서 현재 열쇠 조합 상태가 k일 때 최단거리
 	queue<piii> cp; dir; // (열쇠 조합 상태, 위치)
-	map<pii, int> keyPos, doorPos; // (위치, 종류)
 	loop(i, home, n) loop(j, home, m)
 	{
 		cin >> graph[i][j];
@@ -71,10 +70,6 @@ int main()
 			cp.push({ home, {i, j} });
 			dis[i][j][home] = 1;
 		}
-		// 열쇠 위치 저장
-		else if (islower(graph[i][j])) keyPos[{i, j}]++;
-		// 문 위치 저장
-		else if (isupper(graph[i][j])) doorPos[{i, j}]++;
 	}
 
 	while (!cp.empty())
@@ -95,28 +90,29 @@ int main()
 		{
 			int ci = si + cd[i].lhs;
 			int cj = sj + cd[i].rhs;
+			int cc = sc;
 
 			if (ci < home || cj < home || ci >= n || cj >= m) continue;
 			if (graph[ci][cj] == '#') continue;
 
 			// 열쇠
-			if (keyPos.count({ci, cj}) > home)
+			if (islower(graph[ci][cj]))
 			{
-				int bitmask = 1 << (graph[ci][cj] - 'a'); // a ~ z => 0 ~ 25
+				cc |= 1 << (graph[ci][cj] - 'a'); // a ~ f => 0 ~ 5
 
 				// sc | bitmask => 현재 방문 조합 상태에 해당 열쇠 비트 추가
-				if (dis[ci][cj][sc | bitmask] > home) continue;
+				if (dis[ci][cj][cc] > home) continue;
 
-				cp.push({ sc | bitmask, {ci, cj} });
-				dis[ci][cj][sc | bitmask] = dis[si][sj][sc] + 1;
+				cp.push({ cc, {ci, cj} });
+				dis[ci][cj][cc] = dis[si][sj][sc] + 1;
 			}
 			// 문
-			else if (doorPos.count({ ci, cj }) > home)
+			else if (isupper(graph[ci][cj]))
 			{
-				int bitmask = 1 << (graph[ci][cj] - 'A'); // A ~ Z => 0 ~ 25
+				cc &= 1 << (graph[ci][cj] - 'A'); // A ~ F => 0 ~ 5
 
 				// sc & bitmask => 현재 문의 열쇠가 있는지 체크
-				if ((sc & bitmask) == home) continue;
+				if (cc == home) continue;
 				if (dis[ci][cj][sc] > home) continue;
 
 				cp.push({ sc, {ci, cj} });
