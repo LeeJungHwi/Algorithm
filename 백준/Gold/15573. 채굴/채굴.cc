@@ -50,42 +50,14 @@ queue<pii> cp; dir;
 bool Check(int s, vector<vector<int>> &g, vector<vector<bool>> &vis)
 {
 	// 방문체크 초기화
-	loop(i, home, n) loop(j, home, m) vis[i][j] = false;
+	loop(i, home, n + 1) loop(j, home, m + 2) vis[i][j] = false;
 
 	// 채굴한 광물 개수
 	int cnt = home;
 
-	// 바닥하고만 닿아있는 광물을 제외한 가장자리 광물부터 멀티 소스 BFS
-	loop(i, home, n)
-	{
-		// 첫 열
-		if (g[i][home] <= s && !vis[i][home])
-		{
-			cp.push({ i, home });
-			vis[i][home] = true;
-			cnt++;
-		}
-
-		// 마지막 열
-		if (g[i][m - 1] <= s && !vis[i][m - 1])
-		{
-			cp.push({ i, m - 1 });
-			vis[i][m - 1] = true;
-			cnt++;
-		}
-	}
-	loop(i, home, m)
-	{
-		// 첫 행
-		if (g[home][i] <= s && !vis[home][i])
-		{
-			cp.push({ home, i });
-			vis[home][i] = true;
-			cnt++;
-		}
-
-		// 마지막 행의 양끝을 제외한 곳은 바닥하고만 닿은 광물이므로 X
-	}
+	// 0,0부터 BFS 돌려서 s 강도로 채굴 가능한 광물 개수 카운팅
+	cp.push({ home, home });
+	vis[home][home] = true;
 
 	while (!cp.empty())
 	{
@@ -98,13 +70,14 @@ bool Check(int s, vector<vector<int>> &g, vector<vector<bool>> &vis)
 			int ci = si + cd[i].lhs;
 			int cj = sj + cd[i].rhs;
 
-			if (ci < home || cj < home || ci >= n || cj >= m) continue;
+			if (ci < home || cj < home || ci >= n + 1 || cj >= m + 2) continue;
 			if (vis[ci][cj]) continue;
 			if (g[ci][cj] > s) continue; // 채굴기 성능보다 강도가 높은 광물은 X
 
 			cp.push({ ci, cj });
 			vis[ci][cj] = true;
-			cnt++;
+			// 광물인 경우만 채굴
+			if(g[ci][cj] > home) cnt++;
 		}
 	}
 
@@ -117,16 +90,16 @@ int main()
 {
 	init;
 
-	// 바닥하고만 닿아있는 광물을 제외한 가장자리 광물부터 멀티 소스 BFS
-	// 채굴기 성능 D는 강도가 D이하인 광물을 채굴할 수 있음
+	// 바닥하고만 닿아있는 광물을 제외하기 위해 그래프 크기를 n + 1, m + 2로 하고
+	// 0,0부터 BFS 돌려서 s 강도로 채굴 가능한 광물 개수 카운팅
 	// lo => 0
 	// hi => maxD
 	// s로 채굴했을 때 k개 이상 채굴할 수 있으면 가능한 경우이므로 더 최솟값이 있는지 재탐색
 	cin >> n >> m >> k;
-	mat(int, graph, n, m);
-	mat(bool, vis, n, m);
+	mat(int, graph, n + 1, m + 2);
+	mat(bool, vis, n + 1, m + 2);
 	int l = home, h = -2147000000;
-	loop(i, home, n) loop(j, home, m)
+	loop(i, 1, n + 1) loop(j, 1, m + 1)
 	{
 		cin >> graph[i][j];
 		h = max(h, graph[i][j]);
