@@ -1,45 +1,103 @@
 #include <bits/stdc++.h>
 using namespace std;
-int main(void)
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
+
+// 균형잡힌 세상
+int main()
 {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	while(true)
+	init;
+
+	// 여는 괄호 푸쉬
+	// 닫는 괄호 스택 탑과 짝을 이루지 않으면 X
+	// 끝나고 스택에 남아있으면 X
+
+	while (true)
 	{
-		string a;
-		getline(cin, a); // 공백을 포함한 문자열을 입력받는다
-		if(a==".") // .이면
-			break; // 입력 종료
-		stack<char> s; // 스택 선언
-		bool isValid = true; // 올바른 괄호 쌍인지 체크하는 변수
-		for(auto c : a)
+		string is;
+		getline(cin, is);
+		if (is == ".") return home;
+
+		stack<char> s;
+		bool isCorrect = true;
+		loop(i, home, is.size())
 		{
-			if(c=='(' || c=='[') // ( 이거나 [ 이면
-				s.push(c); // 스택에 여는 괄호 추가
-			else if(c==')') // ) 이면
+			// 여는 괄호 푸쉬
+			if (is[i] == '(' || is[i] == '[') s.push(is[i]);
+			// 닫는 괄호 스택 탑과 짝을 이루지 않으면 X 
+			else if (is[i] == ')')
 			{
-				if(s.empty() || s.top() != '(') // 스택이 비어있거나 스택의 top이 ( 가 아닌경우
+				if (s.empty() || s.top() != '(')
 				{
-					isValid = false; // 올바르지 않은 괄호 쌍
+					isCorrect = false;
 					break;
 				}
-				s.pop(); // 스택의 top이 짝이 맞는 괄호일경우 pop
+
+				s.pop();
 			}
-			else if(c==']') // ] 이면
+			else if (is[i] == ']')
 			{
-				if(s.empty() || s.top() != '[') // 스택이 비어있거나 스택의 top이 [ 가 아닌경우
+				if (s.empty() || s.top() != '[')
 				{
-					isValid = false; // 올바르지 않은 괄호 쌍
+					isCorrect = false;
 					break;
 				}
-				s.pop(); // 스택의 top이 짝이 맞는 괄호일경우 pop
+
+				s.pop();
 			}
 		}
-		if(!s.empty()) // 스택에 괄호가 남아있으면
-			isValid = false; // 올바르지 않은 괄호 쌍
-		if(isValid) // 스택이 올바른 괄호 쌍이면
-			cout << "yes\n";
-		else
-			cout << "no\n";
+
+		// 끝나고 스택에 남아있으면 X
+		elp(cond(!isCorrect || s.size() > home, "no", "yes"));
 	}
+
+	return home;
 }
