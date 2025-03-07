@@ -1,159 +1,134 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-#include <fstream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
+
+#define home 0
+
+#ifdef ONLINE_JUDGE
+#define init ios_base::sync_with_stdio(home); cin.tie(home)
+#else
+#define init ios_base::sync_with_stdio(home); cin.tie(home); ifstream cin("input.txt")
+#endif
+
+#define ll long long
+#define ld long double
+
+#define pii pair<int, int>
+#define piii pair<int, pii>
+#define pll pair<ll, ll>
+#define plll pair<ll, pll>
+
+#define loop(v, s, e) for(int v = (s); v < (e); v++)
+#define rloop(v, s, e) for(int v = (s); v > (e); v--)
+#define mloop(v, a) for(auto v = (a).begin(); v != (a).end(); v++)
+#define mrloop(v, a) for(auto v = (a).rbegin(); v != (a).rend(); v++)
+
+#define p(a) cout << (a)
+#define elp(a) cout << (a) << '\n'
+#define scp(a) cout << (a) << ' '
+
+#define tvec(t, v) vector<t> v
+#define vec(t, v, r) vector<t> v((r))
+#define ivec(t, v, r, i) vector<t> v((r), i)
+#define gmat(t, v, r) vector<vector<t> > v((r))
+#define mat(t, v, r, c) vector<vector<t> > v((r), vector<t>((c)))
+#define imat(t, v, r, c, i) vector<vector<t> > v((r), vector<t>((c), i))
+#define smat(t, v, r, c, s) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s))))
+#define ismat(t, v, r, c, s, i) vector<vector<vector<t> > > v((r), vector<vector<t>>((c), vector<t>((s), i)))
+#define ssmat(t, v, r, c, s1, s2) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2)))))
+#define issmat(t, v, r, c, s1, s2, i) vector<vector<vector<vector<t> > > > v((r), vector<vector<vector<t>>>((c), vector<vector<t>>((s1), vector<t>((s2), i))))
+#define sssmat(t, v, r, c, s1, s2, s3) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3))))))
+#define isssmat(t, v, r, c, s1, s2, s3, i) vector<vector<vector<vector<vector<t> > > > > v((r), vector<vector<vector<vector<t>>>>((c), vector<vector<vector<t>>>((s1), vector<vector<t>>((s2), vector<t>((s3), i)))))
+
+#define dir vector<pii> cd = { {-1, home}, {1, home}, { home, -1 }, { home, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }
+#define kdir vector<pii> kcd = { {-1, -2}, {-2, -1}, { -2, 1 }, { -1, 2 }, { 1, -2 }, { 2, -1 }, { 1, 2 }, { 2, 1 } }
+#define lhs first
+#define rhs second
+
+#define cond(c, t, f) ((c) ? (t) : (f))
+#define all(a) (a).begin(), (a).end()
+#define rall(a) (a).rbegin(), (a).rend()
+
+const int MAX = 2147000000;
+const int MIN = -2147000000;
 
 // AC
 int main()
 {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-	//ifstream cin;
-	//cin.open("input.txt");
+	init;
 
-	// R연산 : 리버스
-	// D연산 : 첫요소 삭제, 비어있는데 D연산 수행시 에러
+	// R => 뒤집기
+	// D => 첫 요소 버리기, 비어있는 경우 에러
 
-	int t; // 테케 수 4
-	cin >> t;
-
-	string command; // 명령어 RDD
-	int eleCnt; // 배열 요소 수 4
-	string ele; // 배열 요소 저장 [1,2,3,4]
-
-	// 테케 수 만큼
-	while (t--)
+	int tc; cin >> tc;
+	
+	while (tc--)
 	{
-		cin >> command >> eleCnt >> ele;
+		string p; cin >> p;
+		int n; cin >> n;
+		deque<int> d;
+		string is; cin >> is;
 
-		// 숫자만 덱에 저장
-
-		ele += ','; // [1,2,3,4],
-		deque<string> d;
-
-		for (int i = 0; i < ele.size(); i++)
+		// , 또는 ]를 만나면 저장
+		string temp = "";
+		loop(i, 1, is.size())
 		{
-			string num;
-
-			// , 가 나올때까지 num에 숫자 저장하고
-			for (int j = i; j < ele.size(); j++)
+			if (is[i] == ',' || is[i] == ']')
 			{
-				if (ele[j] == ',')
-				{
-					i = j;
-					break;
-				}
-
-				if (isdigit(ele[j]))
-				{
-					num += ele[j];
-				}
+				if (temp.empty()) continue;
+				d.push_back(stoi(temp));
+				temp = "";
+				continue;
 			}
 
-			// , 가 나와서 break하면 num을 덱에 저장
-			if (!num.empty())
-			{
-				d.push_back(num);
-			}
+			temp += is[i];
 		}
 
 		// 명령어 수행
-
 		bool isError = false; // 에러인지 체크
-		bool isFront = true; // 앞에서부터인지 체크
-
-		for (int i = 0; i < command.size(); i++)
+		bool isReverse = false; // 현재 뒤집은 상태인지 체크
+		loop(i, home, p.size())
 		{
-			// 리버스면 뒤집은 상태로
-			if (command[i] == 'R')
+			// R => 뒤집기 상태 변경
+			if (p[i] == 'R') isReverse = !isReverse;
+			// D => 뒤집지 않은 상태면 앞에서 빼고 뒤집은 상태면 뒤에서 뺌
+			else
 			{
-				if (isFront) // 앞에서부터면 뒤에서부터로
-				{
-					isFront = false;
-				}
-				else // 뒤에서부터면 앞에서부터로
-				{
-					isFront = true;
-				}
-			}
-			else // 딜리트면 첫요소 삭제, 배열이 빈경우 error
-			{
-				if (d.empty())
-				{
-					cout << "error" << '\n';
-					isError = true;
+				// 비어있는 경우 에러
+				if (d.empty()) { isError = true; break; }
 
-					break;
-				}
-
-				// 앞에서부터면 첫요소 삭제
-				// 뒤에서부터면 막요소 삭제
-				if (isFront)
-				{
-					d.pop_front();
-				}
-				else
-				{
-					d.pop_back();
-				}
+				// 뒤집지 않은 상태면 앞에서 빼고 뒤집은 상태면 뒤에서 뺌 
+				cond(!isReverse, d.pop_front(), d.pop_back());
 			}
 		}
 
-		// 에러면 다음 테케로
-		if (isError)
-		{
-			continue;
-		}
+		// 에러 체크
+		if (isError) { elp("error"); continue; }
 
-		// 애초에 입력배열이 [] 이거나
-		// D연산으로 숫자가 모두 지워졌으면 [] 출력
-		if (ele == "[]" || d.empty())
-		{
-			cout << "[]" << '\n';
-
-			continue;
-		}
-
-		// 에러가 아니므로 배열요소 출력
+		// 명령어 수행이 끝나고 뒤집지 않은 상태면 앞 부터 출력 뒤집은 상태면 뒤 부터 출력
+		p('[');
 		if (!d.empty())
 		{
-			if (isFront) // 앞에서부터면
+			if (!isReverse)
 			{
-				// [1
-				cout << '[' << d.front();
-				d.pop_front();
-
-				// ,2,3,5,8
-				while (!d.empty())
+				loop(i, home, d.size() - 1)
 				{
-					cout << ',' << d.front();
-					d.pop_front();
+					p(d[i]);
+					p(',');
 				}
-
-				// ]
-				cout << ']' << '\n';
+				p(d.back());
 			}
-			else // 뒤에서부터면
+			else
 			{
-				// [1
-				cout << '[' << d.back();
-				d.pop_back();
-
-				// ,2,3,5,8
-				while (!d.empty())
+				rloop(i, d.size() - 1, home)
 				{
-					cout << ',' << d.back();
-					d.pop_back();
+					p(d[i]);
+					p(',');
 				}
-
-				// ]
-				cout << ']' << '\n';
+				p(d.front());
 			}
 		}
+		elp(']');
 	}
 
-	return 0;
+	return home;
 }
