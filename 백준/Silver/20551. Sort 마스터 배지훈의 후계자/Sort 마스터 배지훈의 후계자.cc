@@ -45,36 +45,19 @@ int main()
 {
 	init;
 
+	// A 정렬 후 lb
 	int n, m; cin >> n >> m;
 	vec(int, v, n);
 	loop(i, home, n) cin >> v[i];
 	sort(all(v));
-	map<int, int> mm;
-	int cur = 1;
-	mm[v[home]] = cur++;
-	loop(i, 1, n)
-	{
-		if (v[i - 1] == v[i])
-		{
-			cur++;
-			continue;
-		}
-
-		mm[v[i]] = cur++;
-	}
-
-	//mloop(it, mm) cout << it->first << ' ' << it->second << '\n';
 
 	int num;
 	loop(i, home, m)
 	{
 		cin >> num;
-		if (mm[num] == home)
-		{
-			cout << -1 << '\n';
-			continue;
-		}
-		cout << mm[num] - 1 << '\n';
+
+		int pos = lower_bound(all(v), num) - v.begin();
+		elp(cond(pos == v.size() || v[pos] != num, -1, pos));
 	}
 
 	return home;
